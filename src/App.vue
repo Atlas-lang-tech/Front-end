@@ -1,7 +1,5 @@
-<script setup lang="ts">
-import { Button } from "./shared/ui/button";
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div><Button>Test button</Button></div>
+  <RouterView />
 </template>
