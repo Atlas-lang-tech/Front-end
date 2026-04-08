@@ -45,12 +45,15 @@ const toggleCategory = (title: string) => {
           v-show="!collapsedCategories[category.title]"
           v-for="button in category.buttons"
           :key="button.title"
+          class="flex flex-col gap-3"
         >
-          <SideBarButton
-            :title="button.title"
-            :icon="button.icon"
-            :path="button.path"
-          />
+          <div :class="category.buttons.length > 1 ? 'mb-3' : ''">
+            <SideBarButton
+              :title="button.title"
+              :icon="button.icon"
+              :path="button.path"
+            />
+          </div>
         </div>
       </div>
     </section>

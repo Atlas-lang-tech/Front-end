@@ -27,6 +27,11 @@ export const sideBarData: SideBarCategory[] = [
         icon: "plus",
         path: "/admin/categories/add",
       },
+      {
+        title: "All Categories",
+        icon: "list",
+        path: "/admin/categories",
+      },
     ],
   },
 ];
