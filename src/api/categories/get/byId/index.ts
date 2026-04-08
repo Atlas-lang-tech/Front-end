@@ -1,6 +1,6 @@
 import { $API } from "@/api";
 import type { Category } from "@/types/category";
-import type { Response } from "@/types/response";
+import type { CustomResponse, Response } from "@/types/response";
 
 export interface GetCategoryByIdParams {
   id: string;
@@ -8,6 +8,9 @@ export interface GetCategoryByIdParams {
 
 export const getCategoryById = async ({
   id,
-}: GetCategoryByIdParams): Promise<Response<Category>> => {
-  return $API.get(`/course/private/category/${id}`);
+}: GetCategoryByIdParams): Promise<CustomResponse<Category>> => {
+  const response = await $API.get<CustomResponse<Category>>(
+    `/course/private/category/${id}`,
+  );
+  return response.data;
 };
