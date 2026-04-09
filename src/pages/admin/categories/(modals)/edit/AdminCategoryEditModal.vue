@@ -20,10 +20,9 @@ const props = defineProps<{
   name: string;
 }>();
 
-// Створюємо подію, щоб повідомити список про необхідність оновлення
 const emit = defineEmits(["success"]);
 
-const isOpen = ref(false); // Стан модалки
+const isOpen = ref(false);
 const newName = ref(props.name);
 const editCategory = useCategoryEdit();
 
@@ -34,8 +33,8 @@ const handleSave = async () => {
     await editCategory.mutateAsync({ id: props.id, name: newName.value });
     toast.success("Category edited successfully");
 
-    isOpen.value = false; // Закриваємо модалку
-    emit("success"); // Повідомляємо батьківський компонент
+    isOpen.value = false;
+    emit("success");
   } catch (e) {
     toast.error("Error while editing category");
   }
@@ -56,9 +55,9 @@ const handleSave = async () => {
 
     <DialogContent>
       <DialogHeader>
-        <DialogTitle class="text-h font-bold tracking-tight text-xl"
-          >Edit Category</DialogTitle
-        >
+        <DialogTitle class="text-h font-bold tracking-tight text-xl">
+          Edit Category
+        </DialogTitle>
         <DialogDescription>
           Here you can edit the category details.
         </DialogDescription>

@@ -31,7 +31,13 @@ const handleSubmit = async () => {
       <form class="w-full">
         <div>
           <Label for="name" class="mb-5 font-semibold">Name</Label>
-          <Input type="text" id="name" name="name" v-model="nameField" />
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            v-model="nameField"
+            placeholder="Enter category name.."
+          />
         </div>
 
         <Button

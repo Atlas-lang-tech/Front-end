@@ -14,7 +14,7 @@ const props = defineProps<{
     <Button
       :variant="isActive ? 'default' : 'ghost'"
       class="w-full items-center justify-center px-10 py-3 rounded-2xl text-muted-foreground hover:text-white cursor-pointer"
-      :class="{ 'bg-muted text-white': isActive }"
+      :class="{ ' text-white': isActive }"
       @click="navigate"
     >
       <Icon :name="props.icon" size="32" />
