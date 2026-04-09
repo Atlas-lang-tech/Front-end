@@ -12,8 +12,8 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { PlusIcon, PencilIcon, Trash2Icon } from "lucide-vue-next";
 import AdminCategoryEditModal from "./(modals)/edit/AdminCategoryEditModal.vue";
+import AdminCategoryDeleteModal from "./(modals)/delete/AdminCategoryDeleteModal.vue";
 
 const { state, asyncStatus, refetch } = useCategoryGetAll();
 
@@ -39,7 +39,7 @@ const rangeLabel = computed(() => {
 
 <template>
   <div class="flex flex-col items-center justify-center w-full h-screen">
-    <!-- Скелетон -->
+    <!-- Skeleton -->
     <div
       v-if="asyncStatus === 'loading'"
       class="bg-card border-2 border-border rounded-2xl shadow-[0_4px_0_var(--border)] overflow-hidden"
@@ -49,7 +49,7 @@ const rangeLabel = computed(() => {
       </div>
     </div>
 
-    <!-- Ошибка -->
+    <!-- Error -->
     <div
       v-else-if="state.status === 'error'"
       class="bg-card border-2 border-destructive/40 rounded-2xl shadow-[0_4px_0_var(--destructive)] p-12 text-center"
@@ -60,7 +60,7 @@ const rangeLabel = computed(() => {
       </p>
     </div>
 
-    <!-- Таблица -->
+    <!-- Table -->
     <div
       v-else-if="state.status === 'success'"
       class="bg-card border-2 border-border rounded-2xl shadow-[0_4px_0_var(--border)] overflow-hidden w-[50rem]"
@@ -109,21 +109,18 @@ const rangeLabel = computed(() => {
                   :name="category.name"
                   @success="refetch"
                 />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  @click="handleDelete(category.id)"
-                  class="gap-1.5 text-xs font-extrabold rounded-xl border-2 border-destructive/40 text-destructive bg-destructive/5 shadow-[0_3px_0_color-mix(in_srgb,var(--destructive)_40%,transparent)] active:translate-y-[3px] active:shadow-none hover:bg-destructive/10 transition-all duration-150 cursor-pointer"
-                >
-                  <Trash2Icon class="size-3" />
-                </Button>
+                <AdminCategoryDeleteModal
+                  :id="category.id"
+                  :name="category.name"
+                  @success="refetch"
+                />
               </div>
             </TableCell>
           </TableRow>
         </TableBody>
       </Table>
 
-      <!-- Пагинация -->
+      <!-- Pagination -->
       <div
         class="flex items-center justify-between px-5 py-3.5 border-t-2 border-border bg-muted"
       >
