@@ -1,7 +1,7 @@
 import { $API } from "@/api";
 
 export interface EditCategoryParams {
-  id: string;
+  id: number;
   name: string;
 }
 

@@ -13,8 +13,9 @@ import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { PlusIcon, PencilIcon, Trash2Icon } from "lucide-vue-next";
+import AdminCategoryEditModal from "./(modals)/edit/AdminCategoryEditModal.vue";
 
-const { state, asyncStatus } = useCategoryGetAll();
+const { state, asyncStatus, refetch } = useCategoryGetAll();
 
 const PER_PAGE = 8;
 const page = ref(1);
@@ -34,9 +35,6 @@ const rangeLabel = computed(() => {
   const end = Math.min(page.value * PER_PAGE, categories.value.length);
   return `${start}–${end} of ${categories.value.length}`;
 });
-
-function handleEdit(id: number) {}
-function handleDelete(id: number) {}
 </script>
 
 <template>
@@ -106,14 +104,11 @@ function handleDelete(id: number) {}
             </TableCell>
             <TableCell>
               <div class="flex items-center justify-end gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  @click="handleEdit(category.id)"
-                  class="gap-1.5 text-xs font-extrabold rounded-xl border-2 border-secondary/40 text-secondary bg-secondary/5 shadow-[0_3px_0_color-mix(in_srgb,var(--secondary)_40%,transparent)] active:translate-y-[3px] active:shadow-none hover:bg-secondary/10 transition-all duration-150 cursor-pointer"
-                >
-                  <PencilIcon class="size-3" />
-                </Button>
+                <AdminCategoryEditModal
+                  :id="category.id"
+                  :name="category.name"
+                  @success="refetch"
+                />
                 <Button
                   size="sm"
                   variant="outline"
