@@ -11,7 +11,7 @@ export const buttonVariants = cva(
       variant: {
         // Помаранчева кнопка з твердою тінню
         default:
-          "bg-primary text-primary-foreground shadow-[0_4px_0_var(--primary-border)] hover:opacity-95 active:translate-y-1 active:shadow-none",
+          "bg-primary text-primary-foreground  shadow-[0_4px_0_var(--accent-border)] hover:opacity-95 active:translate-y-1 active:shadow-none",
 
         // Червона кнопка (Error/Destructive)
         destructive:
