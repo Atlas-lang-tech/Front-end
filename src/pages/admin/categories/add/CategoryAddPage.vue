@@ -14,8 +14,6 @@ const handleSubmit = async () => {
   if (!nameField.value) return;
   if (nameField.value.trim() === "") return;
 
-  addCategory.mutate({ name: nameField.value });
-
   try {
     await addCategory.mutateAsync({ name: nameField.value });
     nameField.value = "";
