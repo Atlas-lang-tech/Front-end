@@ -1,3 +1,5 @@
+import { $PAGES } from "@/app/configs/pages.config";
+
 export interface SideBarCategory {
   title: string;
   buttons: SideBarButton[];
@@ -15,7 +17,7 @@ export const sideBarData: SideBarCategory[] = [
       {
         title: "Dashboard",
         icon: "gauge",
-        path: "/admin/dashboard",
+        path: $PAGES.admin.dashboard,
       },
     ],
   },
@@ -25,12 +27,37 @@ export const sideBarData: SideBarCategory[] = [
       {
         title: "Add Category",
         icon: "plus",
-        path: "/admin/categories/add",
+        path: $PAGES.admin.categories.create,
       },
       {
         title: "All Categories",
         icon: "list",
-        path: "/admin/categories",
+        path: $PAGES.admin.categories.list,
+      },
+    ],
+  },
+  {
+    title: "Languages",
+    buttons: [
+      {
+        title: "Add Language",
+        icon: "plus",
+        path: $PAGES.admin.language.create,
+      },
+      {
+        title: "Add language Level",
+        icon: "plus",
+        path: $PAGES.admin.language.languageLevel.create,
+      },
+      {
+        title: "All Languages",
+        icon: "list",
+        path: $PAGES.admin.language.list,
+      },
+      {
+        title: "All language Levels",
+        icon: "list",
+        path: $PAGES.admin.language.languageLevel.list,
       },
     ],
   },
