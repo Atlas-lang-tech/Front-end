@@ -1,12 +1,12 @@
 export interface Language {
-  id: string;
+  id: number;
   name: string;
   code: string;
   icon: string;
 }
 
 export interface LanguageLevel {
-  id: string;
+  id: number;
   name: string;
-  languageId: string;
+  languageId: number;
 }
