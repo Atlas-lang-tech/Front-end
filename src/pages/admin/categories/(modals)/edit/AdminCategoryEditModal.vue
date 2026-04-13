@@ -64,11 +64,17 @@ const handleSave = async () => {
       </DialogHeader>
 
       <div class="py-4">
-        <Input
-          placeholder="Category Name"
-          v-model="newName"
-          @keyup.enter="handleSave"
-        />
+        <div>
+          <Label for="name" class="mb-5 font-semibold">Name</Label>
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            v-model="newName"
+            :default-value="props.name"
+            placeholder="Enter language name.."
+          />
+        </div>
       </div>
 
       <DialogFooter>
