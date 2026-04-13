@@ -1,6 +1,6 @@
 import { $API } from "@/api";
 import type { Category } from "@/types/category";
-import type { CustomResponse, Response } from "@/types/response";
+import type { CustomResponse } from "@/types/response";
 
 export interface GetCategoryByIdParams {
   id: string;
