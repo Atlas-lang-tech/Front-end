@@ -4,9 +4,9 @@ export interface CreateCourseParams {
   cid: string;
   title: string;
   description: string;
-  icons: string;
+  icon: string;
   languageId: number;
-  languageLvlID: number;
+  languageLvlId: number;
   categoryId?: number;
 }
 
@@ -15,9 +15,9 @@ export const createCourse = async (params: CreateCourseParams) => {
     cid: params.cid,
     title: params.title,
     description: params.description,
-    icons: params.icons,
+    icon: params.icon,
     languageId: params.languageId,
-    languageLvlID: params.languageLvlID,
+    languageLvlId: params.languageLvlId,
     categoryId: params.categoryId,
   });
 };

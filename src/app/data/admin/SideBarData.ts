@@ -61,4 +61,19 @@ export const sideBarData: SideBarCategory[] = [
       },
     ],
   },
+  {
+    title: "Courses",
+    buttons: [
+      {
+        title: "Add Course",
+        icon: "plus",
+        path: $PAGES.admin.course.create,
+      },
+      {
+        title: "All Courses",
+        icon: "list",
+        path: $PAGES.admin.course.list,
+      },
+    ],
+  },
 ];

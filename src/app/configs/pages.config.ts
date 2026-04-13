@@ -21,5 +21,9 @@ export const $PAGES = {
         create: "/admin/languages/levels/create",
       },
     },
+    course: {
+      list: "/admin/courses",
+      create: "/admin/courses/create",
+    },
   },
 };
