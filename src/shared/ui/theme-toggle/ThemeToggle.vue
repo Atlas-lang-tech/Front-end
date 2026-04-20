@@ -1,46 +1,28 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { Moon, Sun } from "lucide-vue-next";
-import { Button } from "@/shared/ui/button";
+import { Button } from '@/shared/ui/button'
+import { Moon, Sun } from 'lucide-vue-next'
+import { ref } from 'vue'
 
-const isDark = ref(false);
-
-onMounted(() => {
-  if (
-    localStorage.getItem("theme") === "dark" ||
-    (!("theme" in localStorage) &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) {
-    isDark.value = true;
-    document.documentElement.classList.add("dark");
-  } else {
-    isDark.value = false;
-    document.documentElement.classList.remove("dark");
-  }
-});
+const isDark = ref(
+	document.documentElement.getAttribute('data-theme') === 'dark',
+)
 
 const toggleTheme = () => {
-  isDark.value = !isDark.value;
-  if (isDark.value) {
-    document.documentElement.classList.add("dark");
-    localStorage.setItem("theme", "dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-    localStorage.setItem("theme", "light");
-  }
-};
+	isDark.value = !isDark.value
+	const theme = isDark.value ? 'dark' : 'light'
+	document.documentElement.setAttribute('data-theme', theme)
+	localStorage.setItem('theme', theme)
+}
 </script>
 
 <template>
-  <Button
-    variant="outline"
-    size="icon"
-    @click="toggleTheme"
-    aria-label="Змінити тему"
-    class="cursor-pointer"
-  >
-    <!-- Sun icon for light mode, Moon icon for dark mode -->
-    <Sun v-if="!isDark" class="size-6 text-primary" />
-    <Moon v-else class="size-6 text-foreground" />
-  </Button>
+	<Button
+		size="icon"
+		@click="toggleTheme"
+		aria-label="Toggle Theme"
+		class="cursor-pointer"
+	>
+		<Sun v-if="!isDark" class="size-5 text-foreground" />
+		<Moon v-else class="size-5 text-foreground" />
+	</Button>
 </template>

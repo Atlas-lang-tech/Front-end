@@ -21,7 +21,7 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        'flex cursor-default items-center justify-center py-1.5 text-muted-foreground hover:text-foreground transition-colors',
+        'flex cursor-default items-center justify-center py-1.5 text-muted hover:text-foreground transition-colors',
         props.class,
       )
     "

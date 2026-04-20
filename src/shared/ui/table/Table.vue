@@ -8,11 +8,11 @@ const props = defineProps<{
 <template>
   <div
     data-slot="table-container"
-    class="relative w-full overflow-auto rounded-2xl border-2 border-border shadow-[0_4px_0_var(--border)]"
+    class="relative w-full overflow-hidden"
   >
     <table
       data-slot="table"
-      :class="cn('w-full caption-bottom text-sm font-sans', props.class)"
+      :class="cn('w-full caption-bottom text-sm', props.class)"
     >
       <slot />
     </table>

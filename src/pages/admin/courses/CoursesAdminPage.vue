@@ -10,6 +10,7 @@ import {
 } from "@/shared/ui/table";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
+import { Card } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { useCourseGetAll } from "@/api/courses/get/all/useCourseGetAll";
 import AdminCourseEditModal from "./(modals)/edit/AdminCourseEditModal.vue";
@@ -40,20 +41,20 @@ const rangeLabel = computed(() => {
     <!-- Skeleton -->
     <div
       v-if="asyncStatus === 'loading'"
-      class="bg-card border-2 border-border rounded-2xl shadow-[0_4px_0_var(--border)] overflow-hidden"
+      class="w-[65rem]"
     >
       <div class="p-4 space-y-3">
-        <Skeleton v-for="i in 6" :key="i" class="h-12 w-full rounded-xl" />
+        <Skeleton v-for="i in 6" :key="i" class="h-12 w-full rounded-lg" />
       </div>
     </div>
 
     <!-- Error -->
     <div
       v-else-if="state.status === 'error'"
-      class="bg-card border-2 border-destructive/40 rounded-2xl shadow-[0_4px_0_var(--destructive)] p-12 text-center"
+      class="bg-card border border-destructive p-12 text-center rounded-xl"
     >
-      <p class="text-destructive font-extrabold text-lg">Error loading data</p>
-      <p class="text-muted-foreground text-sm mt-1">
+      <p class="text-destructive font-semibold text-lg">Error loading data</p>
+      <p class="text-muted text-sm mt-1">
         Please try refreshing the page.
       </p>
     </div>
@@ -61,149 +62,121 @@ const rangeLabel = computed(() => {
     <!-- Table -->
     <div
       v-else-if="state.status === 'success'"
-      class="bg-card border-2 border-border rounded-2xl shadow-[0_4px_0_var(--border)] overflow-hidden w-[65rem]"
+      class="w-[65rem]"
     >
-      <Table>
-        <TableHeader>
-          <TableRow class="bg-muted hover:bg-muted border-b-2 border-border">
-            <TableHead
-              class="w-36 font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="w-36">
+                ID
+              </TableHead>
+              <TableHead>
+                Title
+              </TableHead>
+              <TableHead>
+                CID
+              </TableHead>
+              <TableHead>
+                Description
+              </TableHead>
+              <TableHead>
+                Icon
+              </TableHead>
+              <TableHead>
+                Language ID
+              </TableHead>
+              <TableHead>
+                Level ID
+              </TableHead>
+              <TableHead>
+                Category ID
+              </TableHead>
+              <TableHead class="text-right w-52">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow
+              v-for="category in paginated"
+              :key="category.id"
             >
-              ID
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              Title
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              CID
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              Description
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              Icon
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              Language ID
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              level ID
-            </TableHead>
-            <TableHead
-              class="font-extrabold text-xs uppercase tracking-widest text-muted-foreground"
-            >
-              Category id
-            </TableHead>
-            <TableHead
-              class="text-right font-extrabold text-xs uppercase tracking-widest text-muted-foreground w-52"
-            >
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow
-            v-for="category in paginated"
-            :key="category.id"
-            class="border-b border-border last:border-0 hover:bg-muted/40 transition-colors"
-          >
-            <TableCell>
-              <Badge
-                variant="outline"
-                class="font-mono font-bold text-xs text-muted-foreground rounded-lg border-border"
-              >
-                #{{ category.id }}
-              </Badge>
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.title }}
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.cid }}
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.description }}
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.icon }}
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.languageId }}
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.languageLvlId }}
-            </TableCell>
-            <TableCell class="font-bold text-foreground">
-              {{ category.categoryId || "N/A" }}
-            </TableCell>
-            <TableCell>
-              <div class="flex items-center justify-end gap-2">
-                <AdminCourseEditModal :data="category" @success="refetch" />
-                <AdminCourseDeleteModal
-                  :id="Number(category.id)"
-                  :name="category.title"
-                  @success="refetch"
-                />
-              </div>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+              <TableCell>
+                <Badge variant="outline">
+                  #{{ category.id }}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                {{ category.title }}
+              </TableCell>
+              <TableCell>
+                {{ category.cid }}
+              </TableCell>
+              <TableCell>
+                {{ category.description }}
+              </TableCell>
+              <TableCell>
+                {{ category.icon }}
+              </TableCell>
+              <TableCell>
+                {{ category.languageId }}
+              </TableCell>
+              <TableCell>
+                {{ category.languageLvlId }}
+              </TableCell>
+              <TableCell>
+                {{ category.categoryId || "N/A" }}
+              </TableCell>
+              <TableCell>
+                <div class="flex items-center justify-end gap-2">
+                  <AdminCourseEditModal :data="category" @success="refetch" />
+                  <AdminCourseDeleteModal
+                    :id="Number(category.id)"
+                    :name="category.title"
+                    @success="refetch"
+                  />
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
 
-      <!-- Pagination -->
-      <div
-        class="flex items-center justify-between px-5 py-3.5 border-t-2 border-border bg-muted"
-      >
-        <span class="text-sm font-bold text-muted-foreground">
-          {{ rangeLabel }}
-        </span>
-        <div class="flex gap-1.5">
-          <Button
-            size="sm"
-            variant="outline"
-            :disabled="page === 1"
-            @click="page--"
-            class="font-extrabold rounded-xl border-2 border-border shadow-[0_3px_0_var(--border)] active:translate-y-[3px] active:shadow-none disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-150"
-          >
-            ←
-          </Button>
-          <Button
-            v-for="p in totalPages"
-            :key="p"
-            size="sm"
-            @click="page = p"
-            :variant="p === page ? 'default' : 'outline'"
-            :class="
-              p === page
-                ? 'shadow-[0_3px_0_var(--accent-border)] active:translate-y-[3px] active:shadow-none font-extrabold rounded-xl border-2 border-transparent transition-all duration-150'
-                : 'shadow-[0_3px_0_var(--border)] active:translate-y-[3px] active:shadow-none font-extrabold rounded-xl border-2 border-border transition-all duration-150'
-            "
-          >
-            {{ p }}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            :disabled="page === totalPages"
-            @click="page++"
-            class="font-extrabold rounded-xl border-2 border-border shadow-[0_3px_0_var(--border)] active:translate-y-[3px] active:shadow-none disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-150"
-          >
-            →
-          </Button>
+        <div
+          class="flex items-center justify-between px-5 py-3 border-t border-border"
+        >
+          <span class="text-sm text-muted">
+            {{ rangeLabel }}
+          </span>
+          <div class="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              :disabled="page === 1"
+              @click="page--"
+            >
+              ←
+            </Button>
+            <Button
+              v-for="p in totalPages"
+              :key="p"
+              size="sm"
+              @click="page = p"
+              :variant="p === page ? 'default' : 'outline'"
+            >
+              {{ p }}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              :disabled="page === totalPages"
+              @click="page++"
+            >
+              →
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   </div>
 </template>

@@ -89,8 +89,7 @@ const handleSave = async () => {
     <DialogTrigger as-child>
       <Button
         size="sm"
-        variant="outline"
-        class="gap-1.5 p-3 text-xs font-extrabold rounded-xl border-2 border-secondary/40 text-secondary bg-secondary/5 shadow-[0_3px_0_color-mix(in_srgb,var(--secondary)_40%,transparent)] active:translate-y-[3px] active:shadow-none hover:bg-secondary/10 transition-all duration-150 cursor-pointer"
+        class="gap-1.5 p-3 text-xs font-extrabold rounded-xl border-2 border-secondary/40 text-secondary bg-secondary/5 hover:bg-secondary/10 transition-all duration-150 cursor-pointer"
       >
         <PencilIcon class="size-3" />
       </Button>

@@ -23,7 +23,7 @@ const delegatedProps = reactiveOmit(props, "class");
     >
       <div class="flex flex-col items-center justify-center py-12 gap-2">
         <div
-          class="w-12 h-12 rounded-2xl bg-muted border-2 border-border shadow-[0_3px_0_var(--border)] flex items-center justify-center"
+          class="w-12 h-12 rounded-xl bg-card-secondary border border-border flex items-center justify-center"
         >
           <svg
             width="20"
@@ -34,13 +34,13 @@ const delegatedProps = reactiveOmit(props, "class");
             stroke-width="2.5"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-muted-foreground"
+            class="text-muted"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
           </svg>
         </div>
-        <span class="text-muted-foreground font-bold text-sm">
+        <span class="text-muted font-medium text-sm">
           <slot />
         </span>
       </div>
