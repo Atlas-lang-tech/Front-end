@@ -1,90 +1,100 @@
 <script setup lang="ts">
-import { useLanguageCreate } from "@/api/languages/create/useLanguageCreate";
-import { Button } from "@/shared/ui/button";
-import { Card } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-import { ref } from "vue";
-import { toast } from "vue-sonner";
+import { toTypedSchema } from '@vee-validate/valibot'
+import * as v from 'valibot'
+import { useField, useForm } from 'vee-validate'
 
-const nameField = ref("");
-const codeField = ref("");
-const iconField = ref("");
+import { useLanguageCreate } from '@/api/languages/create/useLanguageCreate'
+import { Button } from '@/shared/ui/button'
+import { Card } from '@/shared/ui/card'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
+import { toast } from 'vue-sonner'
 
-const addLanguage = useLanguageCreate();
+// ---------------------
+// validation schema
+// ---------------------
+const schema = v.object({
+	name: v.pipe(v.string(), v.trim(), v.minLength(1, 'Name is required')),
+	code: v.pipe(v.string(), v.trim(), v.minLength(1, 'Code is required')),
+	icon: v.optional(v.string()),
+})
 
-const handleSubmit = async () => {
-  if (
-    !nameField.value ||
-    !codeField.value ||
-    nameField.value.trim() === "" ||
-    codeField.value.trim() === ""
-  )
-    return;
+// ---------------------
+// api
+// ---------------------
+const addLanguage = useLanguageCreate()
 
-  try {
-    await addLanguage.mutateAsync({
-      name: nameField.value,
-      code: codeField.value,
-      icon: iconField.value,
-    });
-    nameField.value = "";
-    codeField.value = "";
-    iconField.value = "";
+// ---------------------
+// form
+// ---------------------
+const { handleSubmit, resetForm, isSubmitting } = useForm({
+	validationSchema: toTypedSchema(schema),
+	initialValues: {
+		name: '',
+		code: '',
+		icon: '',
+	},
+})
 
-    toast.success("Language added successfully");
-  } catch (e) {
-    toast.error("Error while adding language");
-  }
-};
+// ---------------------
+// fields
+// ---------------------
+const { value: name, errorMessage: nameError } = useField<string>('name')
+const { value: code, errorMessage: codeError } = useField<string>('code')
+const { value: icon, errorMessage: iconError } = useField<string>('icon')
+
+// ---------------------
+// submit
+// ---------------------
+const onSubmit = handleSubmit(async values => {
+	try {
+		await addLanguage.mutateAsync({
+			name: values.name,
+			code: values.code,
+			icon: values.icon || '',
+		})
+
+		toast.success('Language added successfully')
+		resetForm()
+	} catch (e) {
+		toast.error('Error while adding language')
+	}
+})
 </script>
 
 <template>
-  <main class="w-full h-screen flex justify-center items-center">
-    <Card class="p-5">
-      <div class="text-2xl font-bold">Add new language</div>
-      <form class="w-full">
-        <div>
-          <Label for="name" class="mb-5 font-semibold">Name</Label>
-          <Input
-            type="text"
-            id="name"
-            name="name"
-            v-model="nameField"
-            placeholder="Enter language name.."
-          />
-        </div>
-        <div class="mt-2">
-          <Label for="code" class="mb-5 font-semibold">Code</Label>
-          <Input
-            type="text"
-            id="code"
-            name="code"
-            v-model="codeField"
-            placeholder="Enter language code.."
-          />
-        </div>
-        <div class="mt-2">
-          <Label for="icon" class="mb-5 font-semibold">Icon</Label>
-          <Input
-            type="text"
-            id="icon"
-            name="icon"
-            v-model="iconField"
-            placeholder="Enter language icon.."
-          />
-        </div>
+	<main class="w-full h-full flex justify-center items-center">
+		<Card class="p-5">
+			<div class="text-2xl font-bold">Add new language</div>
 
-        <Button
-          type="submit"
-          class="w-full mt-5"
-          size="sm"
-          :disabled="addLanguage.asyncStatus.value === 'loading' ? true : false"
-          @click.prevent="handleSubmit"
-        >
-          Save
-        </Button>
-      </form>
-    </Card>
-  </main>
+			<form @submit="onSubmit" class="w-full">
+				<div>
+					<Label>Name</Label>
+					<Input v-model="name" placeholder="Enter language name.." />
+					<p class="text-red-500 text-sm">{{ nameError }}</p>
+				</div>
+
+				<div class="mt-2">
+					<Label>Code</Label>
+					<Input v-model="code" placeholder="Enter language code.." />
+					<p class="text-red-500 text-sm">{{ codeError }}</p>
+				</div>
+
+				<div class="mt-2">
+					<Label>Icon</Label>
+					<Input v-model="icon" placeholder="Enter language icon.." />
+					<p class="text-red-500 text-sm">{{ iconError }}</p>
+				</div>
+
+				<Button
+					type="submit"
+					class="w-full mt-5"
+					size="sm"
+					:disabled="isSubmitting"
+				>
+					Save
+				</Button>
+			</form>
+		</Card>
+	</main>
 </template>
