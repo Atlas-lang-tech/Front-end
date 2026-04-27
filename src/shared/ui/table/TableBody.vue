@@ -8,7 +8,7 @@ const props = defineProps<{
 <template>
   <tbody
     data-slot="table-body"
-    :class="cn('bg-card [&_tr:last-child]:border-0', props.class)"
+    :class="cn('[&_tr:first-child]:border-t', props.class)"
   >
     <slot />
   </tbody>

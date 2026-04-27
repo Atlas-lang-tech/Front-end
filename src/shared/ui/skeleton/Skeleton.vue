@@ -11,7 +11,7 @@ const props = defineProps<SkeletonProps>();
     data-slot="skeleton"
     :class="
       cn(
-        'animate-pulse rounded-xl bg-muted border-2 border-border',
+        'animate-pulse rounded-lg bg-card-secondary border border-border-subtle',
         props.class,
       )
     "

@@ -39,7 +39,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       :class="
         cn(
           'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 p-6 duration-200 sm:max-w-lg',
-          'bg-card border-2 border-border shadow-[0_8px_0_var(--border)] rounded-3xl',
+          'bg-card border border-border rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           props.class,
         )
@@ -50,7 +50,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       <DialogClose
         v-if="showCloseButton"
         data-slot="dialog-close"
-        class="absolute top-4 right-4 rounded-xl border-2 border-border/20 p-1 text-muted-foreground transition-all hover:bg-accent hover:text-accent-foreground active:translate-y-0.5 active:shadow-none shadow-[0_2px_0_var(--border)]"
+        class="absolute top-4 right-4 rounded-lg border border-border p-1.5 text-muted transition-colors hover:bg-card-secondary hover:text-foreground"
       >
         <X class="size-4" />
         <span class="sr-only">Close</span>

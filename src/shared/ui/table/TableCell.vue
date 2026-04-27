@@ -10,7 +10,7 @@ const props = defineProps<{
     data-slot="table-cell"
     :class="
       cn(
-        'px-4 py-3 align-middle whitespace-nowrap font-sans text-sm text-foreground',
+        'p-4 align-middle text-sm text-foreground',
         '[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
         props.class,
       )

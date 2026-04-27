@@ -7,7 +7,7 @@ const props = defineProps<DialogDescriptionProps & { class?: string }>();
 
 <template>
   <DialogDescription
-    :class="cn('text-muted-foreground text-sm font-sans', props.class)"
+    :class="cn('text-muted text-sm font-sans', props.class)"
   >
     <slot />
   </DialogDescription>

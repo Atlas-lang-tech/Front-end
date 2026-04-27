@@ -3,22 +3,28 @@ import { cva } from "class-variance-authority";
 export { default as Badge } from "./Badge.vue";
 
 export const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-xl border-2 px-2.5 py-0.5 text-xs font-extrabold w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none transition-all duration-150 overflow-hidden",
+  "inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none transition-all duration-150",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground border-[var(--accent-border)] shadow-[0_3px_0_var(--accent-border)]",
+          "bg-card-secondary border border-border text-secondary",
         secondary:
-          "bg-secondary text-secondary-foreground border-[color-mix(in_srgb,var(--secondary)_60%,transparent)] shadow-[0_3px_0_color-mix(in_srgb,var(--secondary)_40%,transparent)]",
+          "bg-card-secondary border border-border text-secondary",
         destructive:
-          "bg-destructive text-white border-[color-mix(in_srgb,var(--destructive)_60%,transparent)] shadow-[0_3px_0_color-mix(in_srgb,var(--destructive)_40%,transparent)]",
+          "bg-status-error/10 border border-status-error text-status-error",
         outline:
-          "bg-card text-foreground border-border shadow-[0_3px_0_var(--border)]",
+          "bg-transparent border border-border text-secondary",
         success:
-          "bg-emerald-500 text-white border-emerald-700 shadow-[0_3px_0_theme(colors.emerald.700)]",
+          "bg-status-success/10 border border-status-success text-status-success",
         warning:
-          "bg-amber-400 text-amber-900 border-amber-600 shadow-[0_3px_0_theme(colors.amber.600)]",
+          "bg-status-pending/10 border border-status-pending text-status-pending",
+        active:
+          "bg-status-success/10 border border-status-success text-status-success",
+        pending:
+          "bg-status-pending/10 border border-status-pending text-status-pending",
+        canceled:
+          "bg-status-error/10 border border-status-error text-status-error",
       },
     },
     defaultVariants: {

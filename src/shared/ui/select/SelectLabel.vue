@@ -14,7 +14,7 @@ const props = defineProps<
     data-slot="select-label"
     :class="
       cn(
-        'text-muted-foreground font-bold font-sans px-3 py-2 text-xs uppercase tracking-wider',
+        'text-muted font-semibold font-sans px-3 py-2 text-xs uppercase tracking-wider',
         props.class,
       )
     "
