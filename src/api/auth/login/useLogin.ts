@@ -1,3 +1,4 @@
+import { useUserStore } from '@/stores/user.store'
 import { useMutation } from '@pinia/colada'
 import { login, type LoginParams } from '.'
 
@@ -5,8 +6,9 @@ export const useLogin = () => {
 	return useMutation({
 		mutation: (params: LoginParams) => login(params),
 		onSuccess: data => {
-			console.log(data)
-			localStorage.setItem('accessToken', data.data.accessToken)
+			localStorage.setItem('accessToken', data.data.token.accessToken)
+			const userStore = useUserStore()
+			userStore.setUser(data.data.user)
 		},
 	})
 }

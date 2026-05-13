@@ -7,7 +7,10 @@ import Label from '@/shared/ui/label/Label.vue'
 import { toTypedSchema } from '@vee-validate/valibot'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+
+const router = useRouter()
 
 const schema = v.object({
 	email: v.pipe(
@@ -63,6 +66,7 @@ const onSubmit = handleSubmit(async formValues => {
 		})
 
 		toast.success('Account created successfully')
+		router.push($PAGES.auth.login)
 		resetForm()
 	} catch (e) {
 		toast.error('Error while creating account')
