@@ -1,5 +1,6 @@
 export const $PAGES = {
 	main: {
+		index: '/',
 		catalog: '/catalog',
 		myLearning: '/my-learning',
 		profile: '/profile',

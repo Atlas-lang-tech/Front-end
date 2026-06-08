@@ -18,6 +18,7 @@ const toggleTheme = () => {
 <template>
 	<Button
 		size="icon"
+		variant="ghost"
 		@click="toggleTheme"
 		aria-label="Toggle Theme"
 		class="cursor-pointer"

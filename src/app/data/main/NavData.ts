@@ -8,12 +8,12 @@ export interface NavItem {
 
 export const navData: NavItem[] = [
 	{
-		title: 'Каталог',
+		title: 'Catalog',
 		icon: 'book-open',
 		path: $PAGES.main.catalog,
 	},
 	{
-		title: 'Моє навчання',
+		title: 'My Learning',
 		icon: 'graduation-cap',
 		path: $PAGES.main.myLearning,
 	},
