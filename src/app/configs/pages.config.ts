@@ -1,4 +1,10 @@
 export const $PAGES = {
+	main: {
+		catalog: '/catalog',
+		myLearning: '/my-learning',
+		profile: '/profile',
+	},
+
 	auth: {
 		login: '/auth/login',
 		register: '/auth/registration',
