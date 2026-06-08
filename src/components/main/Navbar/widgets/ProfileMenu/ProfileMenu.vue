@@ -10,7 +10,6 @@ import {
 } from '@/shared/ui/dropdown-menu'
 import { useUserStore } from '@/stores/user.store'
 import { LogOut, User } from 'lucide-vue-next'
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 // ---------------------
@@ -19,10 +18,6 @@ import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
 const router = useRouter()
-
-const initial = computed(() =>
-	userStore.user?.username?.charAt(0).toUpperCase(),
-)
 
 // ---------------------
 // logout
@@ -39,17 +34,16 @@ const logout = () => {
 	<DropdownMenu>
 		<DropdownMenuTrigger
 			class="flex items-center justify-center h-10 w-10 rounded-full bg-primary text-white font-semibold cursor-pointer transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-			aria-label="Меню профілю"
+			aria-label="User Profile Menu"
 		>
-			<span v-if="initial">{{ initial }}</span>
-			<User v-else class="w-5 h-5" />
+			<User class="w-5 h-5" />
 		</DropdownMenuTrigger>
 
 		<DropdownMenuContent align="end" class="min-w-56">
 			<DropdownMenuLabel>
 				<div class="flex flex-col">
 					<span class="font-semibold">
-						{{ userStore.user?.username ?? 'Гість' }}
+						{{ userStore.user?.username ?? 'Guest' }}
 					</span>
 					<span
 						v-if="userStore.user?.email"
@@ -65,7 +59,7 @@ const logout = () => {
 			<RouterLink :to="$PAGES.main.profile">
 				<DropdownMenuItem class="cursor-pointer gap-2">
 					<User class="w-4 h-4" />
-					Профіль
+					Profile
 				</DropdownMenuItem>
 			</RouterLink>
 
@@ -74,7 +68,7 @@ const logout = () => {
 				@click="logout"
 			>
 				<LogOut class="w-4 h-4" />
-				Вийти
+				Log out
 			</DropdownMenuItem>
 		</DropdownMenuContent>
 	</DropdownMenu>
