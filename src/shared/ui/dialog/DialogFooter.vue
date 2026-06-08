@@ -24,7 +24,6 @@ const props = withDefaults(
     <slot />
     <DialogClose v-if="showCloseButton" as-child>
       <Button
-        variant="outline"
         class="rounded-xl border-2 border-border shadow-[0_4px_0_var(--border)] active:translate-y-1 active:shadow-none transition-all"
       >
         Close

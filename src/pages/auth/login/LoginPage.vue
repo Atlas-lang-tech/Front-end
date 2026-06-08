@@ -7,6 +7,7 @@ import Label from '@/shared/ui/label/Label.vue'
 import { toTypedSchema } from '@vee-validate/valibot'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 
 const schema = v.object({
@@ -36,6 +37,7 @@ const { value: password, errorMessage: passwordError } =
 	useField<string>('password')
 
 const login = useLogin()
+const router = useRouter()
 
 const onSubmit = handleSubmit(async formValues => {
 	try {
@@ -46,6 +48,7 @@ const onSubmit = handleSubmit(async formValues => {
 
 		toast.success('Logged in successfully')
 		resetForm()
+		router.push($PAGES.main.index)
 	} catch (e) {
 		toast.error('Error while logging in')
 	}

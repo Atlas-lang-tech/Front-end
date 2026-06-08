@@ -40,7 +40,7 @@ const refreshAccessToken = async (): Promise<string> => {
 
 	if (!res.ok) {
 		clearTokens()
-		router.push('/login')
+		router.push($PAGES.auth.login)
 		throw new Error('Refresh failed')
 	}
 
@@ -86,7 +86,7 @@ $API.interceptors.response.use(
 		// защита от бесконечного цикла
 		if (originalRequest._retry) {
 			clearTokens()
-			router.push('/login')
+			router.push($PAGES.auth.login)
 			return Promise.reject(error)
 		}
 
