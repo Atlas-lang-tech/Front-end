@@ -1,3 +1,4 @@
+import { $PAGES } from '@/app/configs/pages.config'
 import AdminLayout from '@/layout/AdminLayout.vue'
 import AuthLayout from '@/layout/AuthLayout.vue'
 import MainLayout from '@/layout/MainLayout.vue'
@@ -13,7 +14,24 @@ export const router = createRouter({
 	routes: [
 		{ path: '/user', component: UserLayout, children: userRoutes },
 		{ path: '/admin', component: AdminLayout, children: adminRoutes },
-		{ path: '/auth', component: AuthLayout, children: authRoutes },
+		{
+			path: '/auth',
+			component: AuthLayout,
+			children: authRoutes,
+			meta: { public: true },
+		},
 		{ path: '/', component: MainLayout, children: mainRoutes },
 	],
+})
+
+router.beforeEach(to => {
+	const isAuthenticated = !!localStorage.getItem('accessToken')
+
+	if (!to.meta.public && !isAuthenticated) {
+		return { path: $PAGES.auth.login, query: { redirect: to.fullPath } }
+	}
+
+	if (to.meta.public && isAuthenticated) {
+		return { path: $PAGES.main.index }
+	}
 })
