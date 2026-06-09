@@ -31,6 +31,10 @@ export const $PAGES = {
 		course: {
 			list: '/admin/courses',
 			create: '/admin/courses/create',
+			lessons: (courseId: string | number) =>
+				`/admin/courses/${courseId}/lessons`,
+			lesson: (courseId: string | number, lessonId: string | number) =>
+				`/admin/courses/${courseId}/lessons/${lessonId}`,
 		},
 	},
 }

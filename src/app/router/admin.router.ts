@@ -7,6 +7,8 @@ import LanguagesAdminPage from '@/pages/admin/languages/LanguagesAdminPage.vue'
 import LanguageCreateAdminPage from '@/pages/admin/languages/create/LanguageCreateAdminPage.vue'
 import LanguageLevelsAdminPage from '@/pages/admin/languages/levels/LanguageLevelsAdminPage.vue'
 import LanguageLevelCreateAdminPage from '@/pages/admin/languages/levels/create/LanguageLevelCreateAdminPage.vue'
+import LessonsAdminPage from '@/pages/admin/courses/lessons/LessonsAdminPage.vue'
+import LessonEditorAdminPage from '@/pages/admin/courses/lessons/editor/LessonEditorAdminPage.vue'
 
 // admin.router.ts
 import { h } from 'vue'
@@ -72,6 +74,23 @@ export const adminRoutes = [
 				path: 'create',
 				component: CoursesCreateAdminPage,
 				meta: { breadcrumb: 'Create' },
+			},
+			{
+				path: ':courseId/lessons',
+				component: pass,
+				meta: { breadcrumb: 'Lessons' },
+				children: [
+					{
+						path: '',
+						component: LessonsAdminPage,
+						meta: { breadcrumb: false },
+					},
+					{
+						path: ':lessonId',
+						component: LessonEditorAdminPage,
+						meta: { breadcrumb: 'Editor' },
+					},
+				],
 			},
 		],
 	},
