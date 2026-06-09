@@ -9,6 +9,8 @@ import LanguageLevelsAdminPage from '@/pages/admin/languages/levels/LanguageLeve
 import LanguageLevelCreateAdminPage from '@/pages/admin/languages/levels/create/LanguageLevelCreateAdminPage.vue'
 import LessonsAdminPage from '@/pages/admin/courses/lessons/LessonsAdminPage.vue'
 import LessonEditorAdminPage from '@/pages/admin/courses/lessons/editor/LessonEditorAdminPage.vue'
+import UsersAdminPage from '@/pages/admin/users/UsersAdminPage.vue'
+import type { User } from '@/types/user'
 
 // admin.router.ts
 import { h } from 'vue'
@@ -18,6 +20,12 @@ const pass = { render: () => h(RouterView) }
 
 export const adminRoutes = [
 	{ path: 'dashboard', component: DashboardAdminPage },
+
+	{
+		path: 'users',
+		component: UsersAdminPage,
+		meta: { breadcrumb: 'Users', roles: ['ADMIN'] satisfies User['role'][] },
+	},
 
 	{
 		path: 'categories',

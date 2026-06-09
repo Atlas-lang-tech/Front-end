@@ -1,9 +1,26 @@
 <script setup lang="ts">
+import { $PAGES } from '@/app/configs/pages.config.ts'
 import { sideBarData } from '@/app/data/admin/SideBarData'
-import { Button } from '@/shared/ui/button'
-import { ArrowLeftToLine, ChevronDown } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { useUserStore } from '@/stores/user.store'
+import { ChevronDown } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+import { computed, ref, watch } from 'vue'
 import SideBarButton from './widgets/SideBarButton/SideBarButton.vue'
+
+const { user } = storeToRefs(useUserStore())
+
+const visibleCategories = computed(() =>
+	sideBarData
+		.map(category => ({
+			...category,
+			buttons: category.buttons.filter(
+				button =>
+					!button.roles ||
+					(user.value && button.roles.includes(user.value.role)),
+			),
+		}))
+		.filter(category => category.buttons.length > 0),
+)
 
 const savedCategories = localStorage.getItem('collapsedCategories')
 
@@ -28,17 +45,23 @@ const toggleCategory = (title: string) => {
 	<aside
 		class="w-72 bg-card h-screen border-r-2 border-border flex flex-col items-center"
 	>
-		<div class="my-5 flex gap-3 items-center">
-			<img src="/logo.svg" alt="Admin Panel Logo" class="w-16 h-16" />
-			<div>
-				<h1 class="text-3xl font-bold -mb-2">Pandas</h1>
-				<h1 class="font-semibold ml-0.5">
-					<span class="text-primary">Admin</span> Panel
-				</h1>
+		<RouterLink :to="$PAGES.main.index">
+			<div class="my-5 flex gap-3 items-center">
+				<img src="/logo.svg" alt="Admin Panel Logo" class="w-16 h-16" />
+				<div>
+					<h1 class="text-3xl font-bold -mb-2">Pandas</h1>
+					<h1 class="font-semibold ml-0.5">
+						<span class="text-primary">Admin</span> Panel
+					</h1>
+				</div>
 			</div>
-		</div>
+		</RouterLink>
 		<section class="flex flex-col gap-5 overflow-auto h-[1000rem]">
-			<div v-for="category in sideBarData" :key="category.title" class="w-56">
+			<div
+				v-for="category in visibleCategories"
+				:key="category.title"
+				class="w-56"
+			>
 				<button
 					class="flex items-center justify-between w-full text-sm font-semibold mb-2 hover:text-primary transition-colors"
 					@click="toggleCategory(category.title)"
@@ -70,11 +93,11 @@ const toggleCategory = (title: string) => {
 			</div>
 		</section>
 
-		<RouterLink
+		<!-- <RouterLink
 			to="/user/profile"
 			class="h-full flex flex-col justify-end mb-5 w-full px-10"
 		>
 			<Button variant="destructive"> Go back <ArrowLeftToLine /></Button>
-		</RouterLink>
+		</RouterLink> -->
 	</aside>
 </template>

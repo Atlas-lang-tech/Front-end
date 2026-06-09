@@ -1,4 +1,5 @@
 import { $PAGES } from '@/app/configs/pages.config'
+import type { User } from '@/types/user'
 
 export interface SideBarCategory {
 	title: string
@@ -8,6 +9,7 @@ export interface SideBarButton {
 	title: string
 	icon: string
 	path: string
+	roles?: User['role'][]
 }
 
 export const sideBarData: SideBarCategory[] = [
@@ -18,6 +20,12 @@ export const sideBarData: SideBarCategory[] = [
 				title: 'Dashboard',
 				icon: 'gauge',
 				path: $PAGES.admin.dashboard,
+			},
+			{
+				title: 'Users',
+				icon: 'users',
+				path: $PAGES.admin.users.list,
+				roles: ['ADMIN'],
 			},
 		],
 	},
