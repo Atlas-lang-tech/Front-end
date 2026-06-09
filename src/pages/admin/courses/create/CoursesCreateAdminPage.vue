@@ -52,7 +52,7 @@ const categories = useCategoryGetAll()
 // ---------------------
 // Form
 // ---------------------
-const { handleSubmit, resetForm, setFieldValue, values, isSubmitting } =
+const { handleSubmit, resetForm, setFieldValue, isSubmitting } =
 	useForm({
 		validationSchema: toTypedSchema(schema),
 		initialValues: {

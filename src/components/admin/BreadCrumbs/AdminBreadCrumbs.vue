@@ -43,7 +43,7 @@ const props = withDefaults(
 const route = useRoute()
 const router = useRouter()
 
-function getLabel(matched: RouteLocationMatched, index: number): string {
+function getLabel(matched: RouteLocationMatched): string {
 	if (matched.meta?.breadcrumb && typeof matched.meta.breadcrumb === 'string') {
 		return matched.meta.breadcrumb
 	}
@@ -77,7 +77,7 @@ const crumbs = computed<CrumbItem[]>(() => {
 
 			if (override.hidden) return null as unknown as CrumbItem
 
-			const label = override.label ?? getLabel(m, i)
+			const label = override.label ?? getLabel(m)
 			const to = isLast ? null : (override.to ?? m.path)
 
 			return { label, to, isActive: isLast, icon: override.icon }

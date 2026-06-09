@@ -14,6 +14,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/shared/ui/table'
+import { ListTreeIcon } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import AdminCourseDeleteModal from './(modals)/delete/AdminCourseDeleteModal.vue'
 import AdminCourseEditModal from './(modals)/edit/AdminCourseEditModal.vue'
@@ -118,6 +119,14 @@ const rangeLabel = computed(() => {
 								</TableCell>
 								<TableCell>
 									<div class="flex items-center justify-end gap-2">
+										<RouterLink :to="$PAGES.admin.course.lessons(course.id)">
+											<Button
+												size="sm"
+												class="gap-1.5 p-3 text-xs font-extrabold rounded-xl border-2 border-accent/40 text-accent bg-accent/5 hover:bg-accent/10 transition-all duration-150 cursor-pointer"
+											>
+												<ListTreeIcon class="size-3" />
+											</Button>
+										</RouterLink>
 										<AdminCourseEditModal :data="course" @success="refetch" />
 										<AdminCourseDeleteModal
 											:id="Number(course.id)"
