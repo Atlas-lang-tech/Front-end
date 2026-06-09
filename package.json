@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^1.0.0",
+    "md-editor-v3": "^6.5.1",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
     "reka-ui": "^2.9.3",
@@ -28,7 +29,8 @@
     "vee-validate": "^4.15.1",
     "vue": "^3.5.30",
     "vue-router": "^4.6.4",
-    "vue-sonner": "^2.0.9"
+    "vue-sonner": "^2.0.9",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",
