@@ -9,7 +9,8 @@ import {
 	DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 import { useUserStore } from '@/stores/user.store'
-import { LogOut, User } from 'lucide-vue-next'
+import { LayoutDashboard, LogOut, User } from 'lucide-vue-next'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 // ---------------------
@@ -18,6 +19,15 @@ import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
 const router = useRouter()
+
+// ---------------------
+// roles
+// ---------------------
+
+const isAdmin = computed(
+	() =>
+		userStore.user?.role === 'ADMIN' || userStore.user?.role === 'MODERATOR',
+)
 
 // ---------------------
 // logout
@@ -56,10 +66,24 @@ const logout = () => {
 
 			<DropdownMenuSeparator />
 
+			<RouterLink :to="$PAGES.main.index">
+				<DropdownMenuItem class="cursor-pointer gap-2">
+					<LayoutDashboard class="w-4 h-4" />
+					Dashboard
+				</DropdownMenuItem>
+			</RouterLink>
+
 			<RouterLink :to="$PAGES.main.profile">
 				<DropdownMenuItem class="cursor-pointer gap-2">
 					<User class="w-4 h-4" />
 					Profile
+				</DropdownMenuItem>
+			</RouterLink>
+
+			<RouterLink v-if="isAdmin" :to="$PAGES.admin.dashboard">
+				<DropdownMenuItem class="cursor-pointer gap-2">
+					<LayoutDashboard class="w-4 h-4" />
+					Admin Panel
 				</DropdownMenuItem>
 			</RouterLink>
 
