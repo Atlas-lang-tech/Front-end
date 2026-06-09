@@ -7,11 +7,12 @@
     :color="color"
     :stroke-width="strokeWidth"
   />
-  <span
-    v-else
-    class="lucide-icon--fallback"
-    :style="{ width: `${size}px`, height: `${size}px` }"
-  />
+  <slot v-else>
+    <span
+      class="lucide-icon--fallback"
+      :style="{ width: `${size}px`, height: `${size}px` }"
+    />
+  </slot>
 </template>
 
 <script setup lang="ts">

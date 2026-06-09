@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Icon from '@/shared/icon.vue'
+import CourseIcon from '@/components/course/CourseIcon.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -24,7 +24,7 @@ defineProps<{
 			<div
 				class="flex items-center justify-center size-12 rounded-xl bg-card-secondary text-primary"
 			>
-				<Icon :name="icon" :size="24" />
+				<CourseIcon :name="icon" :size="24" />
 			</div>
 			<Badge variant="outline">{{ languageIcon }} {{ languageName }}</Badge>
 		</div>

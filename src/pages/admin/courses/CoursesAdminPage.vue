@@ -2,6 +2,7 @@
 import { useCourseGetAll } from '@/api/courses/get/all/useCourseGetAll'
 import { $PAGES } from '@/app/configs/pages.config'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
+import CourseIcon from '@/components/course/CourseIcon.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -106,7 +107,7 @@ const rangeLabel = computed(() => {
 									{{ course.description }}
 								</TableCell>
 								<TableCell>
-									{{ course.icon }}
+									<CourseIcon :icon="course.icon" :name="course.icon" />
 								</TableCell>
 								<TableCell>
 									{{ course.languageId }}
