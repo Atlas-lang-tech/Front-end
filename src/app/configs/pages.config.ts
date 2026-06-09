@@ -16,6 +16,9 @@ export const $PAGES = {
 
 	admin: {
 		dashboard: '/admin/dashboard',
+		users: {
+			list: '/admin/users',
+		},
 		categories: {
 			list: '/admin/categories',
 			create: '/admin/categories/create',
