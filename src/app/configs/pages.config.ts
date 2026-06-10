@@ -9,6 +9,11 @@ export const $PAGES = {
 		profile: '/profile',
 	},
 
+	user: {
+		profile: '/user/profile',
+		settings: '/user/settings',
+	},
+
 	auth: {
 		login: '/auth/login',
 		register: '/auth/registration',

@@ -73,7 +73,7 @@ const logout = () => {
 				</DropdownMenuItem>
 			</RouterLink>
 
-			<RouterLink :to="$PAGES.main.profile">
+			<RouterLink :to="$PAGES.user.profile">
 				<DropdownMenuItem class="cursor-pointer gap-2">
 					<User class="w-4 h-4" />
 					Profile
