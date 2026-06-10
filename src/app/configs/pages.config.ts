@@ -2,6 +2,9 @@ export const $PAGES = {
 	main: {
 		index: '/',
 		catalog: '/catalog',
+		course: (courseId: string | number) => `/catalog/${courseId}`,
+		lesson: (courseId: string | number, lessonId: string | number) =>
+			`/catalog/${courseId}/lesson/${lessonId}`,
 		myLearning: '/my-learning',
 		profile: '/profile',
 	},

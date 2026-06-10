@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { $PAGES } from '@/app/configs/pages.config'
 import CourseIcon from '@/components/course/CourseIcon.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -8,6 +9,7 @@ import { Card } from '@/shared/ui/card'
 // ---------------------
 
 defineProps<{
+	id: string
 	title: string
 	description: string
 	icon: string
@@ -37,6 +39,8 @@ defineProps<{
 			<Badge v-if="categoryName" variant="secondary">{{ categoryName }}</Badge>
 		</div>
 
-		<Button class="w-full mt-5">View course</Button>
+		<RouterLink :to="$PAGES.main.course(id)" class="mt-5">
+			<Button class="w-full">View course</Button>
+		</RouterLink>
 	</Card>
 </template>

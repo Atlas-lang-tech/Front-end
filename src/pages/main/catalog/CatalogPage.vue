@@ -207,6 +207,7 @@ const courses = computed(() =>
 			<CourseCard
 				v-for="course in courses"
 				:key="course.id"
+				:id="course.id"
 				:title="course.title"
 				:description="course.description"
 				:icon="course.icon"
