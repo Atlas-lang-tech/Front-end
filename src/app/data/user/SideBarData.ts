@@ -27,4 +27,14 @@ export const userSideBarData: SideBarCategory[] = [
       },
     ],
   },
+  {
+    title: "Learning",
+    buttons: [
+      {
+        title: "Vocabulary",
+        icon: "book",
+        path: $PAGES.user.vocabulary,
+      },
+    ],
+  },
 ];

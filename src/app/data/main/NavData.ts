@@ -17,4 +17,9 @@ export const navData: NavItem[] = [
 		icon: 'graduation-cap',
 		path: $PAGES.main.myLearning,
 	},
+	{
+		title: 'Vocabulary',
+		icon: 'book',
+		path: $PAGES.main.vocabulary,
+	},
 ]

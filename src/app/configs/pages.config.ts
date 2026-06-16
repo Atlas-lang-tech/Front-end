@@ -7,11 +7,19 @@ export const $PAGES = {
 			`/catalog/${courseId}/lesson/${lessonId}`,
 		myLearning: '/my-learning',
 		profile: '/profile',
+		vocabulary: '/vocabulary',
+		vocabularyStudy: (dictionaryId: string | number) =>
+			`/vocabulary/${dictionaryId}`,
+		vocabularyGame: (dictionaryId: string | number, mode: string) =>
+			`/vocabulary/${dictionaryId}/play/${mode}`,
 	},
 
 	user: {
 		profile: '/user/profile',
 		settings: '/user/settings',
+		vocabulary: '/user/vocabulary',
+		vocabularyDetail: (dictionaryId: string | number) =>
+			`/user/vocabulary/${dictionaryId}`,
 	},
 
 	auth: {
