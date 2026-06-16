@@ -4,7 +4,6 @@ export interface EditLanguageParams {
   id: number;
   name: string;
   code: string;
-  icon: string;
 }
 
 export const editLanguage = async (params: EditLanguageParams) => {
@@ -13,7 +12,6 @@ export const editLanguage = async (params: EditLanguageParams) => {
     {
       name: params.name,
       code: params.code,
-      icon: params.icon,
     },
     {},
   );

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
-import { $PAGES } from '@/app/configs/pages.config'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -15,6 +14,7 @@ import {
 	TableRow,
 } from '@/shared/ui/table'
 import { computed, ref } from 'vue'
+import AdminCategoryCreateModal from './(modals)/create/AdminCategoryCreateModal.vue'
 import AdminCategoryDeleteModal from './(modals)/delete/AdminCategoryDeleteModal.vue'
 import AdminCategoryEditModal from './(modals)/edit/AdminCategoryEditModal.vue'
 
@@ -43,9 +43,7 @@ const rangeLabel = computed(() => {
 		<div class="flex flex-col items-center justify-between w-full mb-4">
 			<div class="flex items-center justify-between w-full mb-4">
 				<h1 class="text-3xl font-bold">Categories</h1>
-				<RouterLink :to="$PAGES.admin.categories.create">
-					<Button>New Category</Button>
-				</RouterLink>
+				<AdminCategoryCreateModal @success="refetch" />
 			</div>
 			<div class="flex items-center justify-between w-full">
 				<AdminStatsCard

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
-import { $PAGES } from '@/app/configs/pages.config'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -15,6 +14,7 @@ import {
 	TableRow,
 } from '@/shared/ui/table'
 import { computed, ref } from 'vue'
+import AdminLanguageCreateModal from './(modals)/create/AdminLanguageCreateModal.vue'
 import AdminLanguageDeleteModal from './(modals)/delete/AdminLanguageDeleteModal.vue'
 import AdminLanguageEditModal from './(modals)/edit/AdminLanguageEditModal.vue'
 
@@ -43,9 +43,7 @@ const rangeLabel = computed(() => {
 		<div class="flex flex-col items-center justify-between w-full mb-4">
 			<div class="flex items-center justify-between w-full mb-4">
 				<h1 class="text-3xl font-bold">Languages</h1>
-				<RouterLink :to="$PAGES.admin.language.create">
-					<Button>New Language</Button>
-				</RouterLink>
+				<AdminLanguageCreateModal @success="refetch" />
 			</div>
 			<div class="flex items-center justify-between w-full">
 				<AdminStatsCard
@@ -82,7 +80,6 @@ const rangeLabel = computed(() => {
 								<TableHead class="w-24"> ID </TableHead>
 								<TableHead> Name </TableHead>
 								<TableHead> Code </TableHead>
-								<TableHead> Icon </TableHead>
 								<TableHead class="text-right w-52"> Actions </TableHead>
 							</TableRow>
 						</TableHeader>
@@ -98,15 +95,11 @@ const rangeLabel = computed(() => {
 									{{ language.code }}
 								</TableCell>
 								<TableCell>
-									{{ language.icon }}
-								</TableCell>
-								<TableCell>
 									<div class="flex items-center justify-end gap-2">
 										<AdminLanguageEditModal
 											:id="language.id"
 											:name="language.name"
 											:code="language.code"
-											:icon="language.icon"
 											@success="refetch"
 										/>
 										<AdminLanguageDeleteModal

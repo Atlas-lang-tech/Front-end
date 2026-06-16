@@ -92,7 +92,6 @@ const courses = computed(() =>
 			return {
 				...c,
 				languageName: language?.name ?? '',
-				languageIcon: language?.icon ?? '',
 				levelName: level?.name ?? '',
 				categoryName: category?.name,
 			}
@@ -127,7 +126,7 @@ const courses = computed(() =>
 							:key="language.id"
 							:value="String(language.id)"
 						>
-							{{ language.icon }} {{ language.name }}
+							{{ language.name }}
 						</SelectItem>
 					</SelectContent>
 				</Select>
@@ -212,7 +211,6 @@ const courses = computed(() =>
 				:description="course.description"
 				:icon="course.icon"
 				:language-name="course.languageName"
-				:language-icon="course.languageIcon"
 				:level-name="course.levelName"
 				:category-name="course.categoryName"
 			/>

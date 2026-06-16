@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/valibot'
-import * as v from 'valibot'
-import { useField, useForm } from 'vee-validate'
-
+import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
+import { useLanguageLevelCreate } from '@/api/languages/level/create/useLanguageLevelCreate'
 import { Button } from '@/shared/ui/button'
-import { Card } from '@/shared/ui/card'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 import {
@@ -14,11 +20,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/shared/ui/select'
-
+import { toTypedSchema } from '@vee-validate/valibot'
+import { PlusIcon } from 'lucide-vue-next'
+import * as v from 'valibot'
+import { useField, useForm } from 'vee-validate'
+import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
-import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
-import { useLanguageLevelCreate } from '@/api/languages/level/create/useLanguageLevelCreate'
+// ---------------------
+// emits
+// ---------------------
+const emit = defineEmits(['success'])
 
 // ---------------------
 // schema
@@ -52,6 +64,8 @@ const { value: name, errorMessage: nameError } = useField<string>('name')
 const { value: languageId, errorMessage: languageError } =
 	useField<number>('languageId')
 
+const isOpen = ref(false)
+
 // ---------------------
 // submit
 // ---------------------
@@ -64,6 +78,8 @@ const onSubmit = handleSubmit(async values => {
 
 		toast.success('Language level added successfully')
 		resetForm()
+		isOpen.value = false
+		emit('success')
 	} catch (e) {
 		toast.error('Error while adding language level')
 	}
@@ -71,11 +87,21 @@ const onSubmit = handleSubmit(async values => {
 </script>
 
 <template>
-	<main class="w-full h-full flex justify-center items-center">
-		<Card class="p-5">
-			<div class="text-2xl font-bold">Add new language level</div>
+	<Dialog v-model:open="isOpen">
+		<DialogTrigger as-child>
+			<Button class="gap-1.5">
+				<PlusIcon class="size-4" />
+				New Level
+			</Button>
+		</DialogTrigger>
 
-			<form @submit="onSubmit" class="w-full">
+		<DialogContent>
+			<DialogHeader>
+				<DialogTitle>New Language Level</DialogTitle>
+				<DialogDescription> Add a new language level. </DialogDescription>
+			</DialogHeader>
+
+			<form @submit="onSubmit" class="py-4">
 				<div>
 					<Label>Name</Label>
 					<Input v-model="name" placeholder="Enter language level name.." />
@@ -113,15 +139,12 @@ const onSubmit = handleSubmit(async values => {
 					<p class="text-red-500 text-sm">{{ languageError }}</p>
 				</div>
 
-				<Button
-					type="submit"
-					class="w-full mt-5"
-					size="sm"
-					:disabled="isSubmitting"
-				>
-					Save
-				</Button>
+				<DialogFooter class="mt-4">
+					<Button :disabled="isSubmitting">
+						{{ isSubmitting ? 'Saving...' : 'Create' }}
+					</Button>
+				</DialogFooter>
 			</form>
-		</Card>
-	</main>
+		</DialogContent>
+	</Dialog>
 </template>

@@ -1,24 +1,27 @@
 <script setup lang="ts">
+import { useCategoryCreate } from '@/api/categories/create/useCategryCreate'
+import { Button } from '@/shared/ui/button'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/shared/ui/dialog'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
 import { toTypedSchema } from '@vee-validate/valibot'
+import { PlusIcon } from 'lucide-vue-next'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
-import { watch } from 'vue'
+import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
-import { useLanguageLevelEdit } from '@/api/languages/level/edit/uselanguageLevelEdit'
-
-import { Button } from '@/shared/ui/button'
-
-import { Input } from '@/shared/ui/input'
-
 // ---------------------
-// props / emits
+// emits
 // ---------------------
-const props = defineProps<{
-	id: number
-	name: string
-}>()
-
 const emit = defineEmits(['success'])
 
 // ---------------------
@@ -31,15 +34,15 @@ const schema = v.object({
 // ---------------------
 // api
 // ---------------------
-const editLanguageLevel = useLanguageLevelEdit()
+const addCategory = useCategoryCreate()
 
 // ---------------------
 // form
 // ---------------------
-const { handleSubmit, setValues, isSubmitting } = useForm({
+const { handleSubmit, resetForm, isSubmitting } = useForm({
 	validationSchema: toTypedSchema(schema),
 	initialValues: {
-		name: props.name,
+		name: '',
 	},
 })
 
@@ -48,38 +51,23 @@ const { handleSubmit, setValues, isSubmitting } = useForm({
 // ---------------------
 const { value: name, errorMessage } = useField<string>('name')
 
-// ---------------------
-// dialog state
-// ---------------------
-const isOpen = defineModel<boolean>('open')
-
-// ---------------------
-// sync props → form
-// ---------------------
-watch(
-	() => props.name,
-	val => {
-		setValues({ name: val })
-	},
-	{ immediate: true },
-)
+const isOpen = ref(false)
 
 // ---------------------
 // submit
 // ---------------------
 const onSubmit = handleSubmit(async values => {
 	try {
-		await editLanguageLevel.mutateAsync({
-			id: props.id,
+		await addCategory.mutateAsync({
 			name: values.name,
 		})
 
-		toast.success('Language level edited successfully')
-
+		toast.success('Category added successfully')
+		resetForm()
 		isOpen.value = false
 		emit('success')
 	} catch (e) {
-		toast.error('Error while editing language level')
+		toast.error('Error while adding category')
 	}
 })
 </script>
@@ -87,29 +75,28 @@ const onSubmit = handleSubmit(async values => {
 <template>
 	<Dialog v-model:open="isOpen">
 		<DialogTrigger as-child>
-			<Button size="sm" class="p-3 rounded-xl">
-				<PencilIcon class="size-3" />
+			<Button class="gap-1.5">
+				<PlusIcon class="size-4" />
+				New Category
 			</Button>
 		</DialogTrigger>
 
 		<DialogContent>
 			<DialogHeader>
-				<DialogTitle>Edit language level</DialogTitle>
-				<DialogDescription>
-					Here you can edit the language level details.
-				</DialogDescription>
+				<DialogTitle>New Category</DialogTitle>
+				<DialogDescription> Add a new category. </DialogDescription>
 			</DialogHeader>
 
 			<form @submit="onSubmit" class="py-4">
 				<div>
 					<Label>Name</Label>
-					<Input v-model="name" placeholder="Enter language level name.." />
+					<Input v-model="name" placeholder="Enter category name.." />
 					<p class="text-red-500 text-sm">{{ errorMessage }}</p>
 				</div>
 
 				<DialogFooter class="mt-4">
 					<Button :disabled="isSubmitting">
-						{{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+						{{ isSubmitting ? 'Saving...' : 'Create' }}
 					</Button>
 				</DialogFooter>
 			</form>

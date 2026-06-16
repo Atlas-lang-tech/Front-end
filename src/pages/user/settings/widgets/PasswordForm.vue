@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useUserPasswordEdit } from '@/api/users/password/useUserPasswordEdit'
+import { useUserStore } from '@/stores/user.store'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Input } from '@/shared/ui/input'
@@ -7,6 +9,18 @@ import { toTypedSchema } from '@vee-validate/valibot'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
+
+// ---------------------
+// store
+// ---------------------
+
+const userStore = useUserStore()
+
+// ---------------------
+// api
+// ---------------------
+
+const passwordEdit = useUserPasswordEdit()
 
 // ---------------------
 // schema
@@ -63,12 +77,18 @@ const { value: confirmPassword, errorMessage: confirmPasswordError } =
 // ---------------------
 
 const onSubmit = handleSubmit(async values => {
-	console.log('[settings] change password', {
-		currentPassword: values.currentPassword,
-		newPassword: values.newPassword,
-	})
-	toast.success('Password changed')
-	resetForm()
+	if (!userStore.user) return
+	try {
+		await passwordEdit.mutateAsync({
+			id: userStore.user.id,
+			currentPassword: values.currentPassword,
+			newPassword: values.newPassword,
+		})
+		toast.success('Password changed')
+		resetForm()
+	} catch (e) {
+		toast.error('Failed to change password')
+	}
 })
 </script>
 

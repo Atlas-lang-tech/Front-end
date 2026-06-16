@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/valibot'
-import * as v from 'valibot'
-import { useField, useForm } from 'vee-validate'
-
+import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
+import { useCourseCreate } from '@/api/courses/create/useCourseCreate'
+import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
+import { useLanguageLevelGetByLanguageId } from '@/api/languages/level/get/AllByLanguageId/useLanguageLevelGetByLanguageId'
 import { Button } from '@/shared/ui/button'
-import { Card } from '@/shared/ui/card'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 import {
@@ -14,17 +22,20 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/shared/ui/select'
-
-import { watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/valibot'
+import { PlusIcon } from 'lucide-vue-next'
+import * as v from 'valibot'
+import { useField, useForm } from 'vee-validate'
+import { ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 
-import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
-import { useCourseCreate } from '@/api/courses/create/useCourseCreate'
-import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
-import { useLanguageLevelGetByLanguageId } from '@/api/languages/level/get/AllByLanguageId/useLanguageLevelGetByLanguageId'
+// ---------------------
+// emits
+// ---------------------
+const emit = defineEmits(['success'])
 
 // ---------------------
-// Validation schema (Valibot)
+// schema
 // ---------------------
 const schema = v.object({
 	title: v.pipe(v.string(), v.trim(), v.minLength(1, 'Title is required')),
@@ -43,31 +54,30 @@ const schema = v.object({
 })
 
 // ---------------------
-// API
+// api
 // ---------------------
 const addCourse = useCourseCreate()
 const languages = useLanguageGetAll()
 const categories = useCategoryGetAll()
 
 // ---------------------
-// Form
+// form
 // ---------------------
-const { handleSubmit, resetForm, setFieldValue, isSubmitting } =
-	useForm({
-		validationSchema: toTypedSchema(schema),
-		initialValues: {
-			title: '',
-			cid: '',
-			description: '',
-			icon: '',
-			languageId: undefined,
-			languageLevelId: undefined,
-			categoryId: undefined,
-		},
-	})
+const { handleSubmit, resetForm, setFieldValue, isSubmitting } = useForm({
+	validationSchema: toTypedSchema(schema),
+	initialValues: {
+		title: '',
+		cid: '',
+		description: '',
+		icon: '',
+		languageId: undefined,
+		languageLevelId: undefined,
+		categoryId: undefined,
+	},
+})
 
 // ---------------------
-// Fields
+// fields
 // ---------------------
 const { value: title, errorMessage: titleError } = useField<string>('title')
 const { value: cid, errorMessage: cidError } = useField<string>('cid')
@@ -81,8 +91,10 @@ const { value: languageLevelId, errorMessage: levelError } =
 	useField<number>('languageLevelId')
 const { value: categoryId } = useField<number | undefined>('categoryId')
 
+const isOpen = ref(false)
+
 // ---------------------
-// Dependent query (language levels)
+// dependent query (language levels)
 // ---------------------
 const languageLevels = useLanguageLevelGetByLanguageId(languageId)
 
@@ -94,7 +106,7 @@ watch(languageId, () => {
 })
 
 // ---------------------
-// Submit
+// submit
 // ---------------------
 const onSubmit = handleSubmit(async formValues => {
 	try {
@@ -110,6 +122,8 @@ const onSubmit = handleSubmit(async formValues => {
 
 		toast.success('Course added successfully')
 		resetForm()
+		isOpen.value = false
+		emit('success')
 	} catch (e) {
 		toast.error('Error while adding course')
 	}
@@ -117,11 +131,21 @@ const onSubmit = handleSubmit(async formValues => {
 </script>
 
 <template>
-	<main class="w-full h-full flex justify-center items-center">
-		<Card class="p-5">
-			<div class="text-2xl font-bold">Add new Course</div>
+	<Dialog v-model:open="isOpen">
+		<DialogTrigger as-child>
+			<Button class="gap-1.5">
+				<PlusIcon class="size-4" />
+				New Course
+			</Button>
+		</DialogTrigger>
 
-			<form @submit="onSubmit" class="w-full">
+		<DialogContent>
+			<DialogHeader>
+				<DialogTitle>New Course</DialogTitle>
+				<DialogDescription> Add a new course. </DialogDescription>
+			</DialogHeader>
+
+			<form @submit="onSubmit" class="py-2">
 				<div class="grid grid-cols-2 gap-5">
 					<!-- LEFT COLUMN -->
 					<div>
@@ -135,15 +159,6 @@ const onSubmit = handleSubmit(async formValues => {
 							<Label>CID</Label>
 							<Input v-model="cid" placeholder="Enter course CID.." />
 							<p class="text-red-500 text-sm">{{ cidError }}</p>
-						</div>
-
-						<div class="mt-2">
-							<Label>Description</Label>
-							<Input
-								v-model="description"
-								placeholder="Enter course description.."
-							/>
-							<p class="text-red-500 text-sm">{{ descriptionError }}</p>
 						</div>
 
 						<div class="mt-2">
@@ -241,15 +256,23 @@ const onSubmit = handleSubmit(async formValues => {
 					</div>
 				</div>
 
-				<Button
-					type="submit"
-					class="w-full mt-5"
-					size="sm"
-					:disabled="isSubmitting"
-				>
-					Save
-				</Button>
+				<div class="mt-2">
+					<Label>Description</Label>
+					<textarea
+						v-model="description"
+						rows="4"
+						placeholder="Enter course description.."
+						class="w-full rounded-lg border border-border bg-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+					/>
+					<p class="text-red-500 text-sm">{{ descriptionError }}</p>
+				</div>
+
+				<DialogFooter class="mt-4">
+					<Button :disabled="isSubmitting">
+						{{ isSubmitting ? 'Saving...' : 'Create' }}
+					</Button>
+				</DialogFooter>
 			</form>
-		</Card>
-	</main>
+		</DialogContent>
+	</Dialog>
 </template>

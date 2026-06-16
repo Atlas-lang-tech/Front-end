@@ -1,22 +1,35 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/valibot'
-import * as v from 'valibot'
-import { useField, useForm } from 'vee-validate'
-
 import { useLanguageCreate } from '@/api/languages/create/useLanguageCreate'
 import { Button } from '@/shared/ui/button'
-import { Card } from '@/shared/ui/card'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
+import { toTypedSchema } from '@vee-validate/valibot'
+import { PlusIcon } from 'lucide-vue-next'
+import * as v from 'valibot'
+import { useField, useForm } from 'vee-validate'
+import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
 // ---------------------
-// validation schema
+// emits
+// ---------------------
+const emit = defineEmits(['success'])
+
+// ---------------------
+// schema
 // ---------------------
 const schema = v.object({
 	name: v.pipe(v.string(), v.trim(), v.minLength(1, 'Name is required')),
 	code: v.pipe(v.string(), v.trim(), v.minLength(1, 'Code is required')),
-	icon: v.optional(v.string()),
 })
 
 // ---------------------
@@ -32,7 +45,6 @@ const { handleSubmit, resetForm, isSubmitting } = useForm({
 	initialValues: {
 		name: '',
 		code: '',
-		icon: '',
 	},
 })
 
@@ -41,7 +53,8 @@ const { handleSubmit, resetForm, isSubmitting } = useForm({
 // ---------------------
 const { value: name, errorMessage: nameError } = useField<string>('name')
 const { value: code, errorMessage: codeError } = useField<string>('code')
-const { value: icon, errorMessage: iconError } = useField<string>('icon')
+
+const isOpen = ref(false)
 
 // ---------------------
 // submit
@@ -51,11 +64,12 @@ const onSubmit = handleSubmit(async values => {
 		await addLanguage.mutateAsync({
 			name: values.name,
 			code: values.code,
-			icon: values.icon || '',
 		})
 
 		toast.success('Language added successfully')
 		resetForm()
+		isOpen.value = false
+		emit('success')
 	} catch (e) {
 		toast.error('Error while adding language')
 	}
@@ -63,11 +77,21 @@ const onSubmit = handleSubmit(async values => {
 </script>
 
 <template>
-	<main class="w-full h-full flex justify-center items-center">
-		<Card class="p-5">
-			<div class="text-2xl font-bold">Add new language</div>
+	<Dialog v-model:open="isOpen">
+		<DialogTrigger as-child>
+			<Button class="gap-1.5">
+				<PlusIcon class="size-4" />
+				New Language
+			</Button>
+		</DialogTrigger>
 
-			<form @submit="onSubmit" class="w-full">
+		<DialogContent>
+			<DialogHeader>
+				<DialogTitle>New Language</DialogTitle>
+				<DialogDescription> Add a new language. </DialogDescription>
+			</DialogHeader>
+
+			<form @submit="onSubmit" class="py-4">
 				<div>
 					<Label>Name</Label>
 					<Input v-model="name" placeholder="Enter language name.." />
@@ -80,21 +104,12 @@ const onSubmit = handleSubmit(async values => {
 					<p class="text-red-500 text-sm">{{ codeError }}</p>
 				</div>
 
-				<div class="mt-2">
-					<Label>Icon</Label>
-					<Input v-model="icon" placeholder="Enter language icon.." />
-					<p class="text-red-500 text-sm">{{ iconError }}</p>
-				</div>
-
-				<Button
-					type="submit"
-					class="w-full mt-5"
-					size="sm"
-					:disabled="isSubmitting"
-				>
-					Save
-				</Button>
+				<DialogFooter class="mt-4">
+					<Button :disabled="isSubmitting">
+						{{ isSubmitting ? 'Saving...' : 'Create' }}
+					</Button>
+				</DialogFooter>
 			</form>
-		</Card>
-	</main>
+		</DialogContent>
+	</Dialog>
 </template>

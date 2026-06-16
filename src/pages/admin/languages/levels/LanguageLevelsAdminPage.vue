@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useLanguageLevelGetAll } from '@/api/languages/level/get/all/useLanguageLevelGetAll'
-import { $PAGES } from '@/app/configs/pages.config'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -15,6 +14,7 @@ import {
 	TableRow,
 } from '@/shared/ui/table'
 import { computed, ref } from 'vue'
+import AdminLanguageLevelCreateModal from './(modals)/create/AdminLanguageLevelCreateModal.vue'
 import AdminLanguageLevelDeleteModal from './(modals)/delete/AdminLanguageLevelDeleteModal.vue'
 import AdminLanguageLevelEditModal from './(modals)/edit/AdminLanguageLevelEditModal.vue'
 
@@ -45,9 +45,7 @@ const rangeLabel = computed(() => {
 		<div class="flex flex-col items-center justify-between w-full mb-4">
 			<div class="flex items-center justify-between w-full mb-4">
 				<h1 class="text-3xl font-bold">Language Levels</h1>
-				<RouterLink :to="$PAGES.admin.language.languageLevel.create">
-					<Button>New Level</Button>
-				</RouterLink>
+				<AdminLanguageLevelCreateModal @success="refetch" />
 			</div>
 			<div class="flex items-center justify-between w-full">
 				<AdminStatsCard

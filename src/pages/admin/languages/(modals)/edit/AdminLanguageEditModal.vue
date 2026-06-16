@@ -26,7 +26,6 @@ const props = defineProps<{
 	id: number
 	name: string
 	code: string
-	icon: string
 }>()
 
 const emit = defineEmits(['success'])
@@ -37,7 +36,6 @@ const emit = defineEmits(['success'])
 const schema = v.object({
 	name: v.pipe(v.string(), v.trim(), v.minLength(1, 'Name is required')),
 	code: v.pipe(v.string(), v.trim(), v.minLength(1, 'Code is required')),
-	icon: v.pipe(v.string(), v.trim(), v.minLength(1, 'Icon is required')),
 })
 
 // ---------------------
@@ -53,7 +51,6 @@ const { handleSubmit, setValues, isSubmitting } = useForm({
 	initialValues: {
 		name: props.name,
 		code: props.code,
-		icon: props.icon,
 	},
 })
 
@@ -62,7 +59,6 @@ const { handleSubmit, setValues, isSubmitting } = useForm({
 // ---------------------
 const { value: name } = useField<string>('name')
 const { value: code } = useField<string>('code')
-const { value: icon } = useField<string>('icon')
 
 // ---------------------
 // dialog state
@@ -78,7 +74,6 @@ watch(
 		setValues({
 			name: val.name,
 			code: val.code,
-			icon: val.icon,
 		})
 	},
 	{ immediate: true },
@@ -132,11 +127,6 @@ const onSubmit = handleSubmit(async values => {
 				<div class="mt-2">
 					<Label>Code</Label>
 					<Input v-model="code" placeholder="Enter language code.." />
-				</div>
-
-				<div class="mt-2">
-					<Label>Icon</Label>
-					<Input v-model="icon" placeholder="Enter language icon.." />
 				</div>
 
 				<DialogFooter class="mt-4">

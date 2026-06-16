@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useUserDelete } from '@/api/users/delete/useUserDelete'
 import { $PAGES } from '@/app/configs/pages.config'
 import { useUserStore } from '@/stores/user.store'
 import { Button } from '@/shared/ui/button'
@@ -24,6 +25,12 @@ const userStore = useUserStore()
 const router = useRouter()
 
 // ---------------------
+// api
+// ---------------------
+
+const userDelete = useUserDelete()
+
+// ---------------------
 // state
 // ---------------------
 
@@ -33,13 +40,18 @@ const isOpen = ref(false)
 // submit
 // ---------------------
 
-const onDelete = () => {
-	console.log('[settings] delete account', userStore.user?.id)
-	userStore.clearUser()
-	localStorage.removeItem('accessToken')
-	toast.success('Account deleted')
-	isOpen.value = false
-	router.push($PAGES.auth.login)
+const onDelete = async () => {
+	if (!userStore.user) return
+	try {
+		await userDelete.mutateAsync({ id: userStore.user.id })
+		userStore.clearUser()
+		localStorage.removeItem('accessToken')
+		toast.success('Account deleted')
+		isOpen.value = false
+		router.push($PAGES.auth.login)
+	} catch (e) {
+		toast.error('Failed to delete account')
+	}
 }
 </script>
 

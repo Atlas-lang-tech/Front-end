@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useUserEdit } from '@/api/users/edit/useUserEdit'
 import { useUserStore } from '@/stores/user.store'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -14,6 +15,12 @@ import { toast } from 'vue-sonner'
 // ---------------------
 
 const userStore = useUserStore()
+
+// ---------------------
+// api
+// ---------------------
+
+const userEdit = useUserEdit()
 
 // ---------------------
 // schema
@@ -49,11 +56,18 @@ const { value: email, errorMessage: emailError } = useField<string>('email')
 // ---------------------
 
 const onSubmit = handleSubmit(async values => {
-	console.log('[settings] update account', values)
-	if (userStore.user) {
-		userStore.setUser({ ...userStore.user, ...values })
+	if (!userStore.user) return
+	try {
+		const user = await userEdit.mutateAsync({
+			id: userStore.user.id,
+			username: values.username,
+			email: values.email,
+		})
+		userStore.setUser(user)
+		toast.success('Account updated')
+	} catch (e) {
+		toast.error('Failed to update account')
 	}
-	toast.success('Account updated')
 })
 </script>
 

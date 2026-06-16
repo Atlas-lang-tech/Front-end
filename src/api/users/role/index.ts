@@ -7,5 +7,5 @@ export interface EditUserRoleParams {
 }
 
 export const editUserRole = async ({ id, role }: EditUserRoleParams) => {
-	return $API.patch(`/auth/users/${id}/role`, { role })
+	return $API.patch(`/auth/user/${id}/role`, { role })
 }

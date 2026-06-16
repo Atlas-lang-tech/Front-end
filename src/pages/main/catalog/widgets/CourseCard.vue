@@ -14,7 +14,6 @@ defineProps<{
 	description: string
 	icon: string
 	languageName: string
-	languageIcon: string
 	levelName: string
 	categoryName?: string
 }>()
@@ -28,7 +27,7 @@ defineProps<{
 			>
 				<CourseIcon :name="icon" :size="24" />
 			</div>
-			<Badge variant="outline">{{ languageIcon }} {{ languageName }}</Badge>
+			<Badge variant="outline">{{ languageName }}</Badge>
 		</div>
 
 		<h3 class="text-lg font-bold mb-1">{{ title }}</h3>

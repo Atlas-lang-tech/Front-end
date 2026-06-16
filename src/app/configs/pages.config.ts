@@ -29,19 +29,15 @@ export const $PAGES = {
 		},
 		categories: {
 			list: '/admin/categories',
-			create: '/admin/categories/create',
 		},
 		language: {
 			list: '/admin/languages',
-			create: '/admin/languages/create',
 			languageLevel: {
 				list: '/admin/languages/levels',
-				create: '/admin/languages/levels/create',
 			},
 		},
 		course: {
 			list: '/admin/courses',
-			create: '/admin/courses/create',
 			lessons: (courseId: string | number) =>
 				`/admin/courses/${courseId}/lessons`,
 			lesson: (courseId: string | number, lessonId: string | number) =>

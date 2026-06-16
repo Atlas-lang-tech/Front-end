@@ -17,6 +17,7 @@ import {
 } from '@/shared/ui/table'
 import { ListTreeIcon } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
+import AdminCourseCreateModal from './(modals)/create/AdminCourseCreateModal.vue'
 import AdminCourseDeleteModal from './(modals)/delete/AdminCourseDeleteModal.vue'
 import AdminCourseEditModal from './(modals)/edit/AdminCourseEditModal.vue'
 
@@ -45,9 +46,7 @@ const rangeLabel = computed(() => {
 		<div class="flex flex-col items-center justify-between w-full mb-4">
 			<div class="flex items-center justify-between w-full mb-4">
 				<h1 class="text-3xl font-bold">Courses</h1>
-				<RouterLink :to="$PAGES.admin.course.create">
-					<Button>New Course</Button>
-				</RouterLink>
+				<AdminCourseCreateModal @success="refetch" />
 			</div>
 			<div class="flex items-center justify-between w-full">
 				<AdminStatsCard

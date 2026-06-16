@@ -3,7 +3,6 @@ import { $API } from "@/api";
 export interface CreateLanguageParams {
   name: string;
   code: string;
-  icon: string;
 }
 
 export const createLanguage = async (params: CreateLanguageParams) => {
@@ -12,7 +11,6 @@ export const createLanguage = async (params: CreateLanguageParams) => {
     {
       name: params.name,
       code: params.code,
-      icon: params.icon,
     },
     {},
   );
