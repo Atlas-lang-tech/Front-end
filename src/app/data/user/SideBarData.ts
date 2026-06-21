@@ -25,6 +25,11 @@ export const userSideBarData: SideBarCategory[] = [
         icon: "settings",
         path: $PAGES.user.settings,
       },
+      {
+        title: "Pricing",
+        icon: "credit-card",
+        path: $PAGES.user.pricing,
+      },
     ],
   },
   {

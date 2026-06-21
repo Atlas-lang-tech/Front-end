@@ -37,7 +37,10 @@ const dictionaries = computed(() => state.value.data?.data ?? [])
 					Manage your dictionaries and words.
 				</p>
 			</div>
-			<UserDictionaryCreateModal @success="refetch" />
+			<UserDictionaryCreateModal
+				:current-count="dictionaries.length"
+				@success="refetch"
+			/>
 		</div>
 
 		<!-- loading -->

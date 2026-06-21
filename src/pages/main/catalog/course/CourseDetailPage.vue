@@ -1,13 +1,20 @@
 <script setup lang="ts">
+import { useProduct } from '@/api/billing/products/get/byCourseId/useProduct.ts'
 import { useCourseGetById } from '@/api/courses/get/byId/useCourseGetById.ts'
 import { useLessonGetByCourse } from '@/api/lessons/get/byCourseId/useLessonGetByCourse.ts'
 import { $PAGES } from '@/app/configs/pages.config'
 import CourseIcon from '@/components/course/CourseIcon.vue'
 import Icon from '@/shared/icon.vue'
+import { Badge } from '@/shared/ui/badge'
+import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { computed } from 'vue'
+import { useBillingStore } from '@/stores/billing.store'
+import type { Course } from '@/types/course'
+import { formatPriceCents } from '@/utils/price'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import CoursePurchaseModal from '../(modals)/purchase/CoursePurchaseModal.vue'
 import { isLessonLocked } from './lesson-locking.ts'
 import LessonCard from './widgets/LessonCard.vue'
 
@@ -26,6 +33,7 @@ const { data: courseData } = useCourseGetById({
 	id: String(route.params.courseId),
 })
 const { state, asyncStatus } = useLessonGetByCourse(courseId)
+const { data: productData } = useProduct(courseId)
 
 // ---------------------
 // lessons
@@ -35,6 +43,25 @@ const course = computed(() => courseData.value?.data)
 const lessons = computed(() =>
 	[...(state.value.data?.data ?? [])].sort((a, b) => a.order - b.order),
 )
+
+// ---------------------
+// access
+// ---------------------
+
+const billingStore = useBillingStore()
+const product = computed(() => productData.value?.data)
+
+const hasAccess = computed(() =>
+	course.value ? billingStore.canAccessCourse(course.value as Course) : false,
+)
+
+const priceLabel = computed(() =>
+	course.value?.isFree
+		? 'Free'
+		: formatPriceCents(product.value?.priceCents, product.value?.currency),
+)
+
+const purchaseOpen = ref(false)
 </script>
 
 <template>
@@ -117,6 +144,29 @@ const lessons = computed(() =>
 						>
 							{{ course.description }}
 						</p>
+
+						<div class="mt-6 pt-6 border-t border-border">
+							<template v-if="hasAccess">
+								<Badge variant="success" class="mb-3">
+									{{ course.isFree ? 'Free access' : 'You own this course' }}
+								</Badge>
+								<p class="text-sm text-muted-foreground">
+									Open any lesson on the left to start learning.
+								</p>
+							</template>
+
+							<template v-else>
+								<div class="flex items-center justify-between mb-3">
+									<span class="text-sm text-muted-foreground">Price</span>
+									<span class="text-xl font-bold text-primary">
+										{{ priceLabel }}
+									</span>
+								</div>
+								<Button class="w-full" @click="purchaseOpen = true">
+									Buy this course
+								</Button>
+							</template>
+						</div>
 					</template>
 
 					<template v-else>
@@ -128,5 +178,13 @@ const lessons = computed(() =>
 				</Card>
 			</aside>
 		</div>
+
+		<CoursePurchaseModal
+			v-if="course"
+			v-model:open="purchaseOpen"
+			:course-id="courseId"
+			:title="course.title"
+			:product="product"
+		/>
 	</div>
 </template>

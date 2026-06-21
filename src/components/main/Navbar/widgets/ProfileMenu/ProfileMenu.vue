@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { $PAGES } from '@/app/configs/pages.config'
+import { Badge } from '@/shared/ui/badge'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,6 +9,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import { useBillingStore } from '@/stores/billing.store'
 import { useUserStore } from '@/stores/user.store'
 import { LayoutDashboard, LogOut, User } from 'lucide-vue-next'
 import { computed } from 'vue'
@@ -18,6 +20,7 @@ import { useRouter } from 'vue-router'
 // ---------------------
 
 const userStore = useUserStore()
+const billingStore = useBillingStore()
 const router = useRouter()
 
 // ---------------------
@@ -35,6 +38,7 @@ const isAdmin = computed(
 
 const logout = () => {
 	userStore.clearUser()
+	billingStore.clear()
 	localStorage.removeItem('accessToken')
 	router.push($PAGES.auth.login)
 }
@@ -51,7 +55,7 @@ const logout = () => {
 
 		<DropdownMenuContent align="end" class="min-w-56">
 			<DropdownMenuLabel>
-				<div class="flex flex-col">
+				<div class="flex flex-col gap-1.5">
 					<span class="font-semibold">
 						{{ userStore.user?.username ?? 'Guest' }}
 					</span>
@@ -61,6 +65,15 @@ const logout = () => {
 					>
 						{{ userStore.user.email }}
 					</span>
+					<RouterLink
+						v-if="billingStore.currentPlan"
+						:to="$PAGES.user.pricing"
+						class="mt-0.5"
+					>
+						<Badge variant="success" class="font-normal">
+							{{ billingStore.currentPlan.name }} plan
+						</Badge>
+					</RouterLink>
 				</div>
 			</DropdownMenuLabel>
 

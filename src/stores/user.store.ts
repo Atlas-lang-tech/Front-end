@@ -1,12 +1,14 @@
 import type { User } from '@/types/user'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useUserStore = defineStore(
 	'user',
 	() => {
 		const user = ref<User | null>(null)
 		const isAuthenticated = ref(false)
+
+		const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
 		const setUser = (userData: User) => {
 			user.value = userData
@@ -18,7 +20,7 @@ export const useUserStore = defineStore(
 			isAuthenticated.value = false
 		}
 
-		return { user, isAuthenticated, setUser, clearUser }
+		return { user, isAuthenticated, isAdmin, setUser, clearUser }
 	},
 	{
 		persist: true,

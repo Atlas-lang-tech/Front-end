@@ -2,9 +2,11 @@
 import { toTypedSchema } from '@vee-validate/valibot'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
-import { watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 
+import { useSetProductPrice } from '@/api/billing/admin/setProductPrice/useSetProductPrice'
+import { useProduct } from '@/api/billing/products/get/byCourseId/useProduct'
 import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
 import { useCourseEdit } from '@/api/courses/edit/useCourseEdit'
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
@@ -60,8 +62,27 @@ const schema = v.object({
 // api
 // ---------------------
 const editCourse = useCourseEdit()
+const setProductPrice = useSetProductPrice()
 const languages = useLanguageGetAll()
 const categories = useCategoryGetAll()
+
+// ---------------------
+// pricing
+// ---------------------
+const courseId = computed(() => Number(props.data.id))
+const { data: productData, refetch: refetchProduct } = useProduct(courseId)
+
+const isFree = ref(props.data.isFree)
+const price = ref<number | undefined>(undefined)
+
+watch(
+	() => productData.value?.data,
+	product => {
+		if (product?.priceCents != null) {
+			price.value = product.priceCents / 100
+		}
+	},
+)
 
 // ---------------------
 // form
@@ -118,7 +139,9 @@ watch(isOpen, open => {
 			languageLvlId: props.data.languageLvlId,
 			categoryId: props.data.categoryId,
 		})
+		isFree.value = props.data.isFree
 		languageLevels.refetch()
+		refetchProduct()
 	}
 })
 
@@ -136,7 +159,6 @@ const onLanguageChange = (val: unknown) => {
 // submit
 // ---------------------
 const onSubmit = handleSubmit(async values => {
-	console.log('Course edited successfully')
 	try {
 		await editCourse.mutateAsync({
 			id: Number(props.data.id),
@@ -144,10 +166,20 @@ const onSubmit = handleSubmit(async values => {
 			cid: values.cid,
 			description: values.description,
 			icon: values.icon,
+			isFree: isFree.value,
 			languageId: values.languageId,
 			languageLvlId: values.languageLvlId,
 			categoryId: values.categoryId ?? undefined,
 		})
+
+		if (!isFree.value && price.value !== undefined) {
+			await setProductPrice.mutateAsync({
+				courseId: Number(props.data.id),
+				priceCents: Math.round(price.value * 100),
+				currency: 'USD',
+				isActive: true,
+			})
+		}
 
 		toast.success('Course edited successfully')
 
@@ -292,6 +324,35 @@ const onSubmit = handleSubmit(async values => {
 						class="w-full rounded-lg border border-border bg-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 					/>
 					<p class="text-red-500 text-sm">{{ descriptionError }}</p>
+				</div>
+
+				<div class="grid grid-cols-2 gap-5 mt-2">
+					<div>
+						<Label>Access</Label>
+						<Select
+							:model-value="isFree ? 'free' : 'paid'"
+							@update:model-value="val => (isFree = val === 'free')"
+						>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="free">Free</SelectItem>
+								<SelectItem value="paid">Paid</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
+					<div v-if="!isFree">
+						<Label>Price (USD)</Label>
+						<Input
+							v-model.number="price"
+							type="number"
+							min="0"
+							step="0.01"
+							placeholder="9.99"
+						/>
+					</div>
 				</div>
 
 				<DialogFooter class="mt-4">

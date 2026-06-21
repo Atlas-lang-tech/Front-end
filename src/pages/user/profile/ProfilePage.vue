@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { $PAGES } from '@/app/configs/pages.config'
+import { useBillingStore } from '@/stores/billing.store'
 import { useUserStore } from '@/stores/user.store'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
-import { Mail, Settings } from 'lucide-vue-next'
+import { CreditCard, Mail, Settings } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 
@@ -13,6 +14,7 @@ import { computed } from 'vue'
 // ---------------------
 
 const { user } = storeToRefs(useUserStore())
+const { currentPlan, subscription } = storeToRefs(useBillingStore())
 
 // ---------------------
 // computed
@@ -33,6 +35,13 @@ const roleVariant = computed(() => {
 			return 'success'
 	}
 })
+
+const statusVariant = computed(() =>
+	subscription.value?.status === 'ACTIVE' ? 'success' : 'pending',
+)
+
+const formatDate = (value?: string | null) =>
+	value ? new Date(value).toLocaleDateString() : '—'
 </script>
 
 <template>
@@ -92,6 +101,55 @@ const roleVariant = computed(() => {
 					<p class="text-xs text-muted uppercase tracking-wide">User ID</p>
 					<p class="font-medium mt-1 truncate">{{ user?.id ?? '—' }}</p>
 				</div>
+			</div>
+		</Card>
+
+		<Card class="p-6 mt-6">
+			<div class="flex items-center justify-between mb-4">
+				<div class="flex items-center gap-2">
+					<CreditCard class="w-5 h-5 text-primary" />
+					<h2 class="text-lg font-bold">Subscription</h2>
+				</div>
+				<RouterLink :to="$PAGES.user.pricing">
+					<Button variant="ghost" size="sm">Manage plan</Button>
+				</RouterLink>
+			</div>
+
+			<div v-if="currentPlan" class="grid grid-cols-2 gap-4">
+				<div>
+					<p class="text-xs text-muted uppercase tracking-wide">Plan</p>
+					<div class="flex items-center gap-2 mt-1">
+						<p class="font-medium">{{ currentPlan.name }}</p>
+						<Badge :variant="statusVariant">
+							{{ subscription?.status ?? 'ACTIVE' }}
+						</Badge>
+					</div>
+				</div>
+				<div v-if="subscription">
+					<p class="text-xs text-muted uppercase tracking-wide">Started</p>
+					<p class="font-medium mt-1">{{ formatDate(subscription.startedAt) }}</p>
+				</div>
+				<div v-if="subscription">
+					<p class="text-xs text-muted uppercase tracking-wide">
+						{{ subscription.expiresAt ? 'Renews / expires' : 'Validity' }}
+					</p>
+					<p class="font-medium mt-1">
+						{{
+							subscription.expiresAt
+								? formatDate(subscription.expiresAt)
+								: 'No expiry'
+						}}
+					</p>
+				</div>
+			</div>
+
+			<div v-else class="flex items-center justify-between">
+				<p class="text-sm text-muted-foreground">
+					You are not on any plan yet.
+				</p>
+				<RouterLink :to="$PAGES.user.pricing">
+					<Button size="sm">View plans</Button>
+				</RouterLink>
 			</div>
 		</Card>
 	</div>

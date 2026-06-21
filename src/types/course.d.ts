@@ -5,6 +5,8 @@ export interface Course {
   description: string;
   icon: string;
 
+  isFree: boolean;
+
   languageId: number;
   languageLvlId: number;
   categoryId?: number;

@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { usePlans } from '@/api/billing/plans/get/all/usePlans'
 import { useDictionaryCreate } from '@/api/vocabulary/dictionaries/create/useDictionaryCreate'
+import { $PAGES } from '@/app/configs/pages.config'
+import { useBillingStore } from '@/stores/billing.store'
 import { useUserStore } from '@/stores/user.store'
+import { getApiError } from '@/utils/apiError'
 import Icon from '@/shared/icon.vue'
 import { Button } from '@/shared/ui/button'
 import {
@@ -26,13 +30,18 @@ import { PlusIcon } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { DICTIONARY_ICONS } from '../../dictionary-icons'
 
 // ---------------------
-// emits
+// props / emits
 // ---------------------
+const props = defineProps<{
+	currentCount?: number
+}>()
+
 const emit = defineEmits(['success'])
 
 // ---------------------
@@ -54,6 +63,21 @@ const schema = v.object({
 const addDictionary = useDictionaryCreate()
 
 // ---------------------
+// plan limit
+// ---------------------
+const billingStore = useBillingStore()
+const { data: plansData } = usePlans()
+
+const maxDictionaries = computed(() => {
+	const plan = plansData.value?.data.find(
+		p => p.code === billingStore.subscription?.planCode,
+	)
+	return plan?.maxDictionaries ?? 2
+})
+
+const atLimit = computed(() => (props.currentCount ?? 0) >= maxDictionaries.value)
+
+// ---------------------
 // form
 // ---------------------
 const { handleSubmit, resetForm, isSubmitting } = useForm({
@@ -70,6 +94,7 @@ const { handleSubmit, resetForm, isSubmitting } = useForm({
 const { value: title, errorMessage: titleError } = useField<string>('title')
 const { value: icon, errorMessage: iconError } = useField<string>('icon')
 
+const router = useRouter()
 const isOpen = ref(false)
 
 // ---------------------
@@ -93,7 +118,18 @@ const onSubmit = handleSubmit(async values => {
 		isOpen.value = false
 		emit('success')
 	} catch (e) {
-		toast.error('Error while creating dictionary')
+		const { status, message } = getApiError(e)
+		if (status === 403) {
+			toast.error(message ?? 'Dictionary limit reached for your plan', {
+				description: 'Upgrade your plan to create more dictionaries.',
+				action: {
+					label: 'Upgrade',
+					onClick: () => router.push($PAGES.user.pricing),
+				},
+			})
+		} else {
+			toast.error('Error while creating dictionary')
+		}
 	}
 })
 </script>
@@ -101,7 +137,11 @@ const onSubmit = handleSubmit(async values => {
 <template>
 	<Dialog v-model:open="isOpen">
 		<DialogTrigger as-child>
-			<Button class="gap-1.5">
+			<Button
+				class="gap-1.5"
+				:disabled="atLimit"
+				:title="atLimit ? 'Upgrade your plan to add more dictionaries' : undefined"
+			>
 				<PlusIcon class="size-4" />
 				New Dictionary
 			</Button>

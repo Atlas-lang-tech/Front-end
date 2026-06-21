@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { usePlans } from '@/api/billing/plans/get/all/usePlans'
 import { useWordCreate } from '@/api/vocabulary/words/create/useWordCreate'
+import { $PAGES } from '@/app/configs/pages.config'
+import { useBillingStore } from '@/stores/billing.store'
+import { getApiError } from '@/utils/apiError'
 import { Button } from '@/shared/ui/button'
 import {
 	Dialog,
@@ -16,7 +20,8 @@ import { toTypedSchema } from '@vee-validate/valibot'
 import { PlusIcon } from 'lucide-vue-next'
 import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 
 // ---------------------
@@ -24,6 +29,7 @@ import { toast } from 'vue-sonner'
 // ---------------------
 const props = defineProps<{
 	dictionaryId: number
+	currentCount?: number
 }>()
 
 const emit = defineEmits(['success'])
@@ -47,6 +53,22 @@ const schema = v.object({
 // api
 // ---------------------
 const addWord = useWordCreate()
+
+// ---------------------
+// plan limit
+// ---------------------
+const billingStore = useBillingStore()
+const { data: plansData } = usePlans()
+const router = useRouter()
+
+const maxWords = computed(() => {
+	const plan = plansData.value?.data.find(
+		p => p.code === billingStore.subscription?.planCode,
+	)
+	return plan?.maxWordsPerDict ?? 100
+})
+
+const atLimit = computed(() => (props.currentCount ?? 0) >= maxWords.value)
 
 // ---------------------
 // form
@@ -93,7 +115,18 @@ const onSubmit = handleSubmit(async values => {
 		isOpen.value = false
 		emit('success')
 	} catch (e) {
-		toast.error('Error while adding word')
+		const { status, message } = getApiError(e)
+		if (status === 403) {
+			toast.error(message ?? 'Word limit reached for your plan', {
+				description: 'Upgrade your plan to add more words.',
+				action: {
+					label: 'Upgrade',
+					onClick: () => router.push($PAGES.user.pricing),
+				},
+			})
+		} else {
+			toast.error('Error while adding word')
+		}
 	}
 })
 </script>
@@ -101,7 +134,11 @@ const onSubmit = handleSubmit(async values => {
 <template>
 	<Dialog v-model:open="isOpen">
 		<DialogTrigger as-child>
-			<Button class="gap-1.5">
+			<Button
+				class="gap-1.5"
+				:disabled="atLimit"
+				:title="atLimit ? 'Upgrade your plan to add more words' : undefined"
+			>
 				<PlusIcon class="size-4" />
 				New Word
 			</Button>

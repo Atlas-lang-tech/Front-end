@@ -6,6 +6,7 @@ export interface EditCourseParams {
   title: string;
   description: string;
   icon: string;
+  isFree: boolean;
   languageId: number;
   languageLvlId: number;
   categoryId?: number;
@@ -17,6 +18,7 @@ export const editCourse = async (params: EditCourseParams) => {
     title: params.title,
     description: params.description,
     icon: params.icon,
+    isFree: params.isFree,
     languageId: params.languageId,
     languageLvlId: params.languageLvlId,
     categoryId: params.categoryId,

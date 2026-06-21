@@ -5,6 +5,7 @@ import LanguagesAdminPage from '@/pages/admin/languages/LanguagesAdminPage.vue'
 import LanguageLevelsAdminPage from '@/pages/admin/languages/levels/LanguageLevelsAdminPage.vue'
 import LessonsAdminPage from '@/pages/admin/courses/lessons/LessonsAdminPage.vue'
 import LessonEditorAdminPage from '@/pages/admin/courses/lessons/editor/LessonEditorAdminPage.vue'
+import PlansAdminPage from '@/pages/admin/plans/PlansAdminPage.vue'
 import UsersAdminPage from '@/pages/admin/users/UsersAdminPage.vue'
 import type { User } from '@/types/user'
 
@@ -27,6 +28,12 @@ export const adminRoutes = [
 		path: 'categories',
 		component: CategoryAdminPage,
 		meta: { breadcrumb: 'Categories' },
+	},
+
+	{
+		path: 'plans',
+		component: PlansAdminPage,
+		meta: { breadcrumb: 'Plans', roles: ['ADMIN'] satisfies User['role'][] },
 	},
 
 	{

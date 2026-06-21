@@ -120,7 +120,11 @@ watch([search, levelFilter], () => {
 					{{ dictionary?.title ?? 'Dictionary' }}
 				</h1>
 			</div>
-			<UserWordCreateModal :dictionary-id="dictionaryId" @success="refetch" />
+			<UserWordCreateModal
+				:dictionary-id="dictionaryId"
+				:current-count="words.length"
+				@success="refetch"
+			/>
 		</div>
 
 		<!-- filters -->

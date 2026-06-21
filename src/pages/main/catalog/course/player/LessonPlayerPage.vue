@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useBlockGetByLesson } from '@/api/blocks/get/byLessonId/useBlockGetByLesson.ts'
+import { useProduct } from '@/api/billing/products/get/byCourseId/useProduct.ts'
+import { useCourseGetById } from '@/api/courses/get/byId/useCourseGetById.ts'
 import { useLessonGetByCourse } from '@/api/lessons/get/byCourseId/useLessonGetByCourse.ts'
 import { $PAGES } from '@/app/configs/pages.config'
 import Icon from '@/shared/icon.vue'
@@ -13,8 +15,11 @@ import type {
 	MatchingContent,
 	OneTrueChoiceContent,
 } from '@/types/block'
+import { getApiError } from '@/utils/apiError'
+import { formatPriceCents } from '@/utils/price'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import CoursePurchaseModal from '../../(modals)/purchase/CoursePurchaseModal.vue'
 import { useLessonPlayer } from './useLessonPlayer.ts'
 import LessonMistakesReview from './widgets/LessonMistakesReview.vue'
 import LessonProgressBar from './widgets/LessonProgressBar.vue'
@@ -42,8 +47,31 @@ const lessonId = computed(() => Number(route.params.lessonId))
 
 const { state, asyncStatus } = useBlockGetByLesson(lessonId)
 const { state: lessonsState } = useLessonGetByCourse(courseId)
+const { data: courseData } = useCourseGetById({
+	id: String(route.params.courseId),
+})
+const { data: productData } = useProduct(courseId)
 
 const blocks = computed(() => state.value.data?.data ?? [])
+
+// ---------------------
+// access lock
+// ---------------------
+
+const isLocked = computed(
+	() =>
+		state.value.status === 'error' &&
+		getApiError(state.value.error).status === 403,
+)
+
+const course = computed(() => courseData.value?.data)
+const product = computed(() => productData.value?.data)
+
+const priceLabel = computed(() =>
+	formatPriceCents(product.value?.priceCents, product.value?.currency),
+)
+
+const purchaseOpen = ref(false)
 
 // ---------------------
 // player
@@ -140,6 +168,30 @@ watch(lessonId, () => {
 		>
 			<Skeleton class="h-3 w-full rounded-full" />
 			<Skeleton class="h-64 w-full rounded-xl" />
+		</div>
+
+		<!-- locked -->
+		<div
+			v-else-if="isLocked"
+			class="bg-card border border-border p-12 text-center rounded-xl"
+		>
+			<div
+				class="flex items-center justify-center size-14 rounded-2xl bg-card-secondary text-primary mx-auto mb-4"
+			>
+				<Icon name="lock" :size="28" />
+			</div>
+			<p class="text-foreground font-semibold text-lg">Course locked</p>
+			<p class="text-muted text-sm mt-1">
+				Buy this course to unlock all lessons.
+			</p>
+			<Button class="mt-5" @click="purchaseOpen = true">
+				Buy for {{ priceLabel }}
+			</Button>
+			<div>
+				<Button variant="ghost" class="mt-2" @click="goBack">
+					Back to course
+				</Button>
+			</div>
 		</div>
 
 		<!-- error -->
@@ -255,5 +307,13 @@ watch(lessonId, () => {
 				</Card>
 			</template>
 		</template>
+
+		<CoursePurchaseModal
+			v-if="course"
+			v-model:open="purchaseOpen"
+			:course-id="courseId"
+			:title="course.title"
+			:product="product"
+		/>
 	</div>
 </template>

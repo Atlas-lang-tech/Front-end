@@ -17,6 +17,7 @@ export const $PAGES = {
 	user: {
 		profile: '/user/profile',
 		settings: '/user/settings',
+		pricing: '/user/pricing',
 		vocabulary: '/user/vocabulary',
 		vocabularyDetail: (dictionaryId: string | number) =>
 			`/user/vocabulary/${dictionaryId}`,
@@ -34,6 +35,9 @@ export const $PAGES = {
 		dashboard: '/admin/dashboard',
 		users: {
 			list: '/admin/users',
+		},
+		plans: {
+			list: '/admin/plans',
 		},
 		categories: {
 			list: '/admin/categories',

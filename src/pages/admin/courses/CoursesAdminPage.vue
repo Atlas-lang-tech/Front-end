@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useProducts } from '@/api/billing/products/get/all/useProducts'
 import { useCourseGetAll } from '@/api/courses/get/all/useCourseGetAll'
 import { $PAGES } from '@/app/configs/pages.config'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
@@ -15,6 +16,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/shared/ui/table'
+import { formatPriceCents } from '@/utils/price'
 import { ListTreeIcon } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import AdminCourseCreateModal from './(modals)/create/AdminCourseCreateModal.vue'
@@ -22,11 +24,27 @@ import AdminCourseDeleteModal from './(modals)/delete/AdminCourseDeleteModal.vue
 import AdminCourseEditModal from './(modals)/edit/AdminCourseEditModal.vue'
 
 const { state, asyncStatus, refetch } = useCourseGetAll()
+const { data: productsData, refetch: refetchProducts } = useProducts()
+
+const refetchAll = () => {
+	refetch()
+	refetchProducts()
+}
 
 const PER_PAGE = 8
 const page = ref(1)
 
 const courses = computed(() => state.value.data?.data ?? [])
+
+const productMap = computed(
+	() => new Map(productsData.value?.data.map(p => [p.courseId, p])),
+)
+
+const priceLabel = (course: { id: string | number; isFree: boolean }) => {
+	if (course.isFree) return 'Free'
+	const product = productMap.value.get(Number(course.id))
+	return formatPriceCents(product?.priceCents, product?.currency)
+}
 const totalPages = computed(() => Math.ceil(courses.value.length / PER_PAGE))
 
 const paginated = computed(() => {
@@ -46,7 +64,7 @@ const rangeLabel = computed(() => {
 		<div class="flex flex-col items-center justify-between w-full mb-4">
 			<div class="flex items-center justify-between w-full mb-4">
 				<h1 class="text-3xl font-bold">Courses</h1>
-				<AdminCourseCreateModal @success="refetch" />
+				<AdminCourseCreateModal @success="refetchAll" />
 			</div>
 			<div class="flex items-center justify-between w-full">
 				<AdminStatsCard
@@ -88,6 +106,7 @@ const rangeLabel = computed(() => {
 								<TableHead> Language ID </TableHead>
 								<TableHead> Level ID </TableHead>
 								<TableHead> Category ID </TableHead>
+								<TableHead> Price </TableHead>
 								<TableHead class="text-right w-52"> Actions </TableHead>
 							</TableRow>
 						</TableHeader>
@@ -118,6 +137,11 @@ const rangeLabel = computed(() => {
 									{{ course.categoryId || 'N/A' }}
 								</TableCell>
 								<TableCell>
+									<Badge :variant="course.isFree ? 'success' : 'secondary'">
+										{{ priceLabel(course) }}
+									</Badge>
+								</TableCell>
+								<TableCell>
 									<div class="flex items-center justify-end gap-2">
 										<RouterLink :to="$PAGES.admin.course.lessons(course.id)">
 											<Button
@@ -127,11 +151,11 @@ const rangeLabel = computed(() => {
 												<ListTreeIcon class="size-3" />
 											</Button>
 										</RouterLink>
-										<AdminCourseEditModal :data="course" @success="refetch" />
+										<AdminCourseEditModal :data="course" @success="refetchAll" />
 										<AdminCourseDeleteModal
 											:id="Number(course.id)"
 											:name="course.title"
-											@success="refetch"
+											@success="refetchAll"
 										/>
 									</div>
 								</TableCell>

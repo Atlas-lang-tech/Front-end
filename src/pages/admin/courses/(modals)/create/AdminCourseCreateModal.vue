@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSetProductPrice } from '@/api/billing/admin/setProductPrice/useSetProductPrice'
 import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
 import { useCourseCreate } from '@/api/courses/create/useCourseCreate'
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
@@ -57,8 +58,15 @@ const schema = v.object({
 // api
 // ---------------------
 const addCourse = useCourseCreate()
+const setProductPrice = useSetProductPrice()
 const languages = useLanguageGetAll()
 const categories = useCategoryGetAll()
+
+// ---------------------
+// pricing
+// ---------------------
+const isFree = ref(true)
+const price = ref<number | undefined>(undefined)
 
 // ---------------------
 // form
@@ -110,18 +118,33 @@ watch(languageId, () => {
 // ---------------------
 const onSubmit = handleSubmit(async formValues => {
 	try {
-		await addCourse.mutateAsync({
+		const res = await addCourse.mutateAsync({
 			title: formValues.title,
 			cid: formValues.cid,
 			description: formValues.description,
 			icon: formValues.icon,
+			isFree: isFree.value,
 			languageId: formValues.languageId,
 			languageLvlId: formValues.languageLevelId,
 			categoryId: formValues.categoryId,
 		})
 
+		if (!isFree.value && price.value !== undefined) {
+			const newCourseId = Number((res as any)?.data?.data?.id)
+			if (newCourseId) {
+				await setProductPrice.mutateAsync({
+					courseId: newCourseId,
+					priceCents: Math.round(price.value * 100),
+					currency: 'USD',
+					isActive: true,
+				})
+			}
+		}
+
 		toast.success('Course added successfully')
 		resetForm()
+		isFree.value = true
+		price.value = undefined
 		isOpen.value = false
 		emit('success')
 	} catch (e) {
@@ -265,6 +288,35 @@ const onSubmit = handleSubmit(async formValues => {
 						class="w-full rounded-lg border border-border bg-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 					/>
 					<p class="text-red-500 text-sm">{{ descriptionError }}</p>
+				</div>
+
+				<div class="grid grid-cols-2 gap-5 mt-2">
+					<div>
+						<Label>Access</Label>
+						<Select
+							:model-value="isFree ? 'free' : 'paid'"
+							@update:model-value="val => (isFree = val === 'free')"
+						>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="free">Free</SelectItem>
+								<SelectItem value="paid">Paid</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
+					<div v-if="!isFree">
+						<Label>Price (USD)</Label>
+						<Input
+							v-model.number="price"
+							type="number"
+							min="0"
+							step="0.01"
+							placeholder="9.99"
+						/>
+					</div>
 				</div>
 
 				<DialogFooter class="mt-4">

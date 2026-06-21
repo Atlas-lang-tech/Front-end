@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useProducts } from '@/api/billing/products/get/all/useProducts.ts'
 import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll.ts'
 import { useCourseGetAll } from '@/api/courses/get/all/useCourseGetAll.ts'
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll.ts'
@@ -21,6 +22,7 @@ const { data: catalogLanguages } = useLanguageGetAll()
 const { data: catalogLevels } = useLanguageLevelGetAll()
 const { data: catalogCategories } = useCategoryGetAll()
 const { data: catalogCourses, asyncStatus, state } = useCourseGetAll()
+const { data: catalogProducts } = useProducts()
 
 // ---------------------
 // filters
@@ -40,6 +42,9 @@ const levelMap = computed(
 )
 const categoryMap = computed(
 	() => new Map(catalogCategories.value?.data.map(c => [c.id, c])),
+)
+const productMap = computed(
+	() => new Map(catalogProducts.value?.data.map(p => [p.courseId, p])),
 )
 
 const levelOptions = computed(() => {
@@ -94,6 +99,7 @@ const courses = computed(() =>
 				languageName: language?.name ?? '',
 				levelName: level?.name ?? '',
 				categoryName: category?.name,
+				product: productMap.value.get(Number(c.id)),
 			}
 		}),
 )
@@ -213,6 +219,8 @@ const courses = computed(() =>
 				:language-name="course.languageName"
 				:level-name="course.levelName"
 				:category-name="course.categoryName"
+				:is-free="course.isFree"
+				:product="course.product"
 			/>
 		</div>
 

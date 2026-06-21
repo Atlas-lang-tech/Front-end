@@ -54,4 +54,15 @@ export const sideBarData: SideBarCategory[] = [
 			},
 		],
 	},
+	{
+		title: 'Billing',
+		buttons: [
+			{
+				title: 'Plans',
+				icon: 'credit-card',
+				path: $PAGES.admin.plans.list,
+				roles: ['ADMIN'],
+			},
+		],
+	},
 ]
