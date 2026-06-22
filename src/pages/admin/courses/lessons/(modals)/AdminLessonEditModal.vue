@@ -37,7 +37,6 @@ const schema = v.object({
 		v.trim(),
 		v.minLength(1, 'Description is required'),
 	),
-	icon: v.pipe(v.string(), v.trim(), v.minLength(1, 'Icon is required')),
 })
 
 // ---------------------
@@ -54,7 +53,6 @@ const { handleSubmit, setValues, isSubmitting } = useForm({
 		cid: props.lesson.cid,
 		title: props.lesson.title,
 		description: props.lesson.description ?? '',
-		icon: props.lesson.icon ?? '',
 	},
 })
 
@@ -65,7 +63,6 @@ const { value: cid, errorMessage: cidError } = useField<string>('cid')
 const { value: title, errorMessage: titleError } = useField<string>('title')
 const { value: description, errorMessage: descriptionError } =
 	useField<string>('description')
-const { value: icon, errorMessage: iconError } = useField<string>('icon')
 
 const isOpen = ref(false)
 
@@ -76,7 +73,6 @@ watch(
 			cid: val.cid,
 			title: val.title,
 			description: val.description ?? '',
-			icon: val.icon ?? '',
 		})
 	},
 )
@@ -92,7 +88,6 @@ const onSubmit = handleSubmit(async values => {
 			cid: values.cid,
 			title: values.title,
 			description: values.description,
-			icon: values.icon,
 		})
 		toast.success('Lesson updated')
 		isOpen.value = false
@@ -132,12 +127,6 @@ const onSubmit = handleSubmit(async values => {
 						<Input v-model="cid" placeholder="intro-greetings" />
 						<p class="text-red-500 text-sm">{{ cidError }}</p>
 					</div>
-				</div>
-
-				<div class="flex flex-col gap-2">
-					<Label>Icon</Label>
-					<Input v-model="icon" placeholder="hello.png" />
-					<p class="text-red-500 text-sm">{{ iconError }}</p>
 				</div>
 
 				<div class="flex flex-col gap-2">

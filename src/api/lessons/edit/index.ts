@@ -5,7 +5,6 @@ export interface EditLessonParams {
   cid: string;
   title: string;
   description: string;
-  icon: string;
   courseId: number;
 }
 
@@ -14,7 +13,6 @@ export const editLesson = async (params: EditLessonParams) => {
     cid: params.cid,
     title: params.title,
     description: params.description,
-    icon: params.icon,
     courseId: params.courseId,
   });
 };
