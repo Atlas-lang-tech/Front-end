@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useDictionaryGetByUser } from '@/api/vocabulary/dictionaries/get/byUser/useDictionaryGetByUser'
 import { $PAGES } from '@/app/configs/pages.config'
+import PlanLimitNotice from '@/components/billing/PlanLimitNotice.vue'
+import { usePlanLimits } from '@/composables/usePlanLimits'
 import { useUserStore } from '@/stores/user.store'
 import Icon from '@/shared/icon.vue'
 import { Card } from '@/shared/ui/card'
@@ -26,6 +28,12 @@ const { state, asyncStatus, refetch } = useDictionaryGetByUser(userId)
 // data
 // ---------------------
 const dictionaries = computed(() => state.value.data?.data ?? [])
+
+// ---------------------
+// plan limit
+// ---------------------
+const { maxDictionaries } = usePlanLimits()
+const atLimit = computed(() => dictionaries.value.length >= maxDictionaries.value)
 </script>
 
 <template>
@@ -42,6 +50,12 @@ const dictionaries = computed(() => state.value.data?.data ?? [])
 				@success="refetch"
 			/>
 		</div>
+
+		<PlanLimitNotice
+			v-if="atLimit"
+			class="mb-6"
+			:description="`You've reached your plan limit of ${maxDictionaries} dictionaries. Upgrade to create more.`"
+		/>
 
 		<!-- loading -->
 		<div

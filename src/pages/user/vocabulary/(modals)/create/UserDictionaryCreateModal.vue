@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { usePlans } from '@/api/billing/plans/get/all/usePlans'
 import { useDictionaryCreate } from '@/api/vocabulary/dictionaries/create/useDictionaryCreate'
 import { $PAGES } from '@/app/configs/pages.config'
-import { useBillingStore } from '@/stores/billing.store'
+import { usePlanLimits } from '@/composables/usePlanLimits'
 import { useUserStore } from '@/stores/user.store'
 import { getApiError } from '@/utils/apiError'
 import Icon from '@/shared/icon.vue'
@@ -65,15 +64,7 @@ const addDictionary = useDictionaryCreate()
 // ---------------------
 // plan limit
 // ---------------------
-const billingStore = useBillingStore()
-const { data: plansData } = usePlans()
-
-const maxDictionaries = computed(() => {
-	const plan = plansData.value?.data.find(
-		p => p.code === billingStore.subscription?.planCode,
-	)
-	return plan?.maxDictionaries ?? 2
-})
+const { maxDictionaries } = usePlanLimits()
 
 const atLimit = computed(() => (props.currentCount ?? 0) >= maxDictionaries.value)
 

@@ -2,6 +2,8 @@
 import { useDictionaryGetById } from '@/api/vocabulary/dictionaries/get/byId/useDictionaryGetById'
 import { useWordGetByDictionary } from '@/api/vocabulary/words/get/byDictionary/useWordGetByDictionary'
 import { $PAGES } from '@/app/configs/pages.config'
+import PlanLimitNotice from '@/components/billing/PlanLimitNotice.vue'
+import { usePlanLimits } from '@/composables/usePlanLimits'
 import Icon from '@/shared/icon.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -62,6 +64,12 @@ const levelVariant = (level: WordLevel) =>
 // data
 // ---------------------
 const words = computed(() => state.value.data?.data ?? [])
+
+// ---------------------
+// plan limit
+// ---------------------
+const { maxWordsPerDict } = usePlanLimits()
+const atLimit = computed(() => words.value.length >= maxWordsPerDict.value)
 
 const filtered = computed(() => {
 	const q = search.value.trim().toLowerCase()
@@ -126,6 +134,12 @@ watch([search, levelFilter], () => {
 				@success="refetch"
 			/>
 		</div>
+
+		<PlanLimitNotice
+			v-if="atLimit"
+			class="mb-4"
+			:description="`You've reached your plan limit of ${maxWordsPerDict} words per dictionary. Upgrade to add more.`"
+		/>
 
 		<!-- filters -->
 		<div class="flex flex-col sm:flex-row gap-3 mb-4">

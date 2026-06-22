@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { usePlans } from '@/api/billing/plans/get/all/usePlans'
 import { useWordCreate } from '@/api/vocabulary/words/create/useWordCreate'
 import { $PAGES } from '@/app/configs/pages.config'
-import { useBillingStore } from '@/stores/billing.store'
+import { usePlanLimits } from '@/composables/usePlanLimits'
 import { getApiError } from '@/utils/apiError'
 import { Button } from '@/shared/ui/button'
 import {
@@ -57,18 +56,10 @@ const addWord = useWordCreate()
 // ---------------------
 // plan limit
 // ---------------------
-const billingStore = useBillingStore()
-const { data: plansData } = usePlans()
+const { maxWordsPerDict } = usePlanLimits()
 const router = useRouter()
 
-const maxWords = computed(() => {
-	const plan = plansData.value?.data.find(
-		p => p.code === billingStore.subscription?.planCode,
-	)
-	return plan?.maxWordsPerDict ?? 100
-})
-
-const atLimit = computed(() => (props.currentCount ?? 0) >= maxWords.value)
+const atLimit = computed(() => (props.currentCount ?? 0) >= maxWordsPerDict.value)
 
 // ---------------------
 // form
