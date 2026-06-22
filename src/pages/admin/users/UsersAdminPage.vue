@@ -86,6 +86,7 @@ const roleVariant = (role: User['role']) => {
 								<TableHead> Username </TableHead>
 								<TableHead> Email </TableHead>
 								<TableHead> Role </TableHead>
+								<TableHead> Plan </TableHead>
 								<TableHead class="text-right w-52"> Actions </TableHead>
 							</TableRow>
 						</TableHeader>
@@ -106,10 +107,17 @@ const roleVariant = (role: User['role']) => {
 									</Badge>
 								</TableCell>
 								<TableCell>
+									<Badge v-if="user.planCode" variant="outline">
+										{{ user.planCode }}
+									</Badge>
+									<span v-else class="text-muted text-sm">—</span>
+								</TableCell>
+								<TableCell>
 									<div class="flex items-center justify-end gap-2">
 										<AdminUserPlanModal
 											:id="user.id"
 											:username="user.username"
+											:plan-code="user.planCode"
 											@success="refetch"
 										/>
 										<AdminUserRoleModal
