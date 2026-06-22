@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSetPlanActive } from '@/api/billing/admin/plans/setActive/useSetPlanActive'
 import { usePlans } from '@/api/billing/plans/get/all/usePlans'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
 import { Badge } from '@/shared/ui/badge'
@@ -13,8 +14,11 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/shared/ui/table'
+import type { Plan } from '@/types/billing'
 import { formatPriceCents } from '@/utils/price'
+import { EyeIcon, EyeOffIcon } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
+import { toast } from 'vue-sonner'
 import AdminPlanCreateModal from './(modals)/create/AdminPlanCreateModal.vue'
 import AdminPlanDeleteModal from './(modals)/delete/AdminPlanDeleteModal.vue'
 import AdminPlanEditModal from './(modals)/edit/AdminPlanEditModal.vue'
@@ -23,6 +27,26 @@ import AdminPlanEditModal from './(modals)/edit/AdminPlanEditModal.vue'
 // api
 // ---------------------
 const { state, asyncStatus, refetch } = usePlans()
+
+const setPlanActive = useSetPlanActive()
+
+const togglingCode = ref<string | null>(null)
+
+const toggleActive = async (plan: Plan) => {
+	togglingCode.value = plan.code
+	try {
+		await setPlanActive.mutateAsync({
+			code: plan.code,
+			isActive: !plan.isActive,
+		})
+		toast.success(plan.isActive ? 'Plan deactivated' : 'Plan activated')
+		await refetch()
+	} catch (e) {
+		toast.error('Error while updating plan status')
+	} finally {
+		togglingCode.value = null
+	}
+}
 
 // ---------------------
 // pagination
@@ -110,6 +134,21 @@ const rangeLabel = computed(() => {
 								</TableCell>
 								<TableCell>
 									<div class="flex items-center justify-end gap-2">
+										<Button
+											size="sm"
+											:disabled="togglingCode === plan.code"
+											:title="plan.isActive ? 'Deactivate plan' : 'Activate plan'"
+											class="gap-1.5 p-3 text-xs font-extrabold rounded-xl border-2 transition-all duration-150 cursor-pointer"
+											:class="
+												plan.isActive
+													? 'border-status-success/40 text-status-success bg-status-success/5 hover:bg-status-success/10'
+													: 'border-muted/40 text-muted bg-muted/5 hover:bg-muted/10'
+											"
+											@click="toggleActive(plan)"
+										>
+											<EyeIcon v-if="plan.isActive" class="size-3" />
+											<EyeOffIcon v-else class="size-3" />
+										</Button>
 										<AdminPlanEditModal :data="plan" @success="refetch" />
 										<AdminPlanDeleteModal
 											:code="plan.code"
