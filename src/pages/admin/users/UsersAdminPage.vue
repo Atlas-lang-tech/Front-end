@@ -15,6 +15,7 @@ import {
 } from '@/shared/ui/table'
 import type { User } from '@/types/user'
 import { computed, ref } from 'vue'
+import AdminUserPlanModal from './(modals)/plan/AdminUserPlanModal.vue'
 import AdminUserRoleModal from './(modals)/role/AdminUserRoleModal.vue'
 
 const { state, asyncStatus, refetch } = useUserGetAll()
@@ -106,6 +107,11 @@ const roleVariant = (role: User['role']) => {
 								</TableCell>
 								<TableCell>
 									<div class="flex items-center justify-end gap-2">
+										<AdminUserPlanModal
+											:id="user.id"
+											:username="user.username"
+											@success="refetch"
+										/>
 										<AdminUserRoleModal
 											:id="user.id"
 											:username="user.username"
