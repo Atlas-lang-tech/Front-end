@@ -7,7 +7,9 @@ export interface EditCourseParams {
   description: string;
   icon: string;
   isFree: boolean;
+  isVisible?: boolean;
   languageId: number;
+  nativeLanguageId?: number;
   languageLvlId: number;
   categoryId?: number;
 }
@@ -19,7 +21,9 @@ export const editCourse = async (params: EditCourseParams) => {
     description: params.description,
     icon: params.icon,
     isFree: params.isFree,
+    isVisible: params.isVisible,
     languageId: params.languageId,
+    nativeLanguageId: params.nativeLanguageId,
     languageLvlId: params.languageLvlId,
     categoryId: params.categoryId,
   });

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AccountForm from './widgets/AccountForm.vue'
 import DeleteAccount from './widgets/DeleteAccount.vue'
+import LanguageForm from './widgets/LanguageForm.vue'
 import PasswordForm from './widgets/PasswordForm.vue'
 </script>
 
@@ -14,6 +15,7 @@ import PasswordForm from './widgets/PasswordForm.vue'
 		</div>
 		<div class="flex flex-col gap-6">
 			<AccountForm />
+			<LanguageForm />
 			<PasswordForm />
 			<DeleteAccount />
 		</div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useProduct } from '@/api/billing/products/get/byCourseId/useProduct.ts'
 import { useCourseGetById } from '@/api/courses/get/byId/useCourseGetById.ts'
+import { useCourseProgress } from '@/api/courses/get/progress/useCourseProgress.ts'
 import { useLessonGetByCourse } from '@/api/lessons/get/byCourseId/useLessonGetByCourse.ts'
 import { $PAGES } from '@/app/configs/pages.config'
 import CourseIcon from '@/components/course/CourseIcon.vue'
@@ -34,6 +35,7 @@ const { data: courseData } = useCourseGetById({
 })
 const { state, asyncStatus } = useLessonGetByCourse(courseId)
 const { data: productData } = useProduct(courseId)
+const { data: progressData } = useCourseProgress(courseId)
 
 // ---------------------
 // lessons
@@ -42,6 +44,19 @@ const { data: productData } = useProduct(courseId)
 const course = computed(() => courseData.value?.data)
 const lessons = computed(() =>
 	[...(state.value.data?.data ?? [])].sort((a, b) => a.order - b.order),
+)
+
+// ---------------------
+// progress
+// ---------------------
+
+const completedLessonIds = computed(() => progressData.value?.data?.lessonIds ?? [])
+const completedCount = computed(() => progressData.value?.data?.completed ?? 0)
+const totalCount = computed(() => progressData.value?.data?.total ?? lessons.value.length)
+const progressPercent = computed(() =>
+	totalCount.value > 0
+		? Math.round((completedCount.value / totalCount.value) * 100)
+		: 0,
 )
 
 // ---------------------
@@ -80,6 +95,24 @@ const purchaseOpen = ref(false)
 			<div class="order-2 lg:order-1 lg:col-span-2">
 				<h2 class="text-lg font-bold mb-4">Lessons</h2>
 
+				<!-- progress -->
+				<div v-if="lessons.length" class="mb-5">
+					<div
+						class="flex items-center justify-between text-sm mb-2"
+					>
+						<span class="font-medium text-foreground">Your progress</span>
+						<span class="text-muted-foreground">
+							{{ completedCount }}/{{ totalCount }} · {{ progressPercent }}%
+						</span>
+					</div>
+					<div class="h-2.5 w-full rounded-full bg-card-secondary overflow-hidden">
+						<div
+							class="h-full rounded-full bg-status-success transition-[width] duration-300"
+							:style="{ width: `${progressPercent}%` }"
+						/>
+					</div>
+				</div>
+
 				<!-- loading -->
 				<div v-if="asyncStatus === 'loading'" class="flex flex-col gap-3">
 					<Skeleton v-for="i in 5" :key="i" class="h-20 w-full rounded-xl" />
@@ -105,7 +138,8 @@ const purchaseOpen = ref(false)
 						:key="lesson.id"
 						:lesson="lesson"
 						:index="index"
-						:locked="isLessonLocked(lesson, lessons)"
+						:locked="isLessonLocked(lesson, lessons, completedLessonIds)"
+						:completed="completedLessonIds.includes(lesson.id)"
 					/>
 				</div>
 

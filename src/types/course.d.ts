@@ -6,8 +6,10 @@ export interface Course {
   icon: string;
 
   isFree: boolean;
+  isVisible: boolean;
 
   languageId: number;
+  nativeLanguageId: number | null;
   languageLvlId: number;
   categoryId?: number;
 }

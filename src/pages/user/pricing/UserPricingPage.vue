@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePlans } from '@/api/billing/plans/get/all/usePlans'
+import { useActivePlans } from '@/api/billing/plans/get/allActive/useActivePlans'
 import { useMySubscription } from '@/api/billing/subscription/get/me/useMySubscription'
 import Icon from '@/shared/icon.vue'
 import { Badge } from '@/shared/ui/badge'
@@ -14,7 +14,7 @@ import { toast } from 'vue-sonner'
 // api
 // ---------------------
 
-const { data: plansData, asyncStatus, state } = usePlans()
+const { data: plansData, asyncStatus, state } = useActivePlans()
 const { data: subscriptionData } = useMySubscription()
 
 // ---------------------
@@ -83,7 +83,10 @@ const onChoose = () => {
 				{{ subscription?.status ?? 'ACTIVE' }}
 			</Badge>
 
-			<div v-if="subscription" class="sm:ml-auto flex items-center gap-6 text-sm">
+			<div
+				v-if="subscription"
+				class="sm:ml-auto flex items-center gap-6 text-sm"
+			>
 				<div>
 					<p class="text-xs text-muted uppercase tracking-wide">Started</p>
 					<p class="font-medium mt-0.5">

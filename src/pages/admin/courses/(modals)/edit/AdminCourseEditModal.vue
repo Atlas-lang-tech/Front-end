@@ -12,6 +12,7 @@ import { useCourseEdit } from '@/api/courses/edit/useCourseEdit'
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
 import { useLanguageLevelGetByLanguageId } from '@/api/languages/level/get/AllByLanguageId/useLanguageLevelGetByLanguageId'
 
+import { IconPicker } from '@/components/IconPicker'
 import { Button } from '@/shared/ui/button'
 import {
 	Dialog,
@@ -54,6 +55,7 @@ const schema = v.object({
 	icon: v.pipe(v.string(), v.trim(), v.minLength(1, 'Icon is required')),
 
 	languageId: v.number('Language is required'),
+	nativeLanguageId: v.nullish(v.number()),
 	languageLvlId: v.number('Language level is required'),
 	categoryId: v.nullish(v.number()),
 })
@@ -74,6 +76,7 @@ const { data: productData, refetch: refetchProduct } = useProduct(courseId)
 
 const isFree = ref(props.data.isFree)
 const price = ref<number | undefined>(undefined)
+const isVisible = ref(props.data.isVisible)
 
 watch(
 	() => productData.value?.data,
@@ -95,6 +98,7 @@ const { handleSubmit, setValues, setFieldValue, isSubmitting } = useForm({
 		description: props.data.description,
 		icon: props.data.icon,
 		languageId: props.data.languageId,
+		nativeLanguageId: props.data.nativeLanguageId,
 		languageLvlId: props.data.languageLvlId,
 		categoryId: props.data.categoryId,
 	},
@@ -111,6 +115,8 @@ const { value: icon, errorMessage: iconError } = useField<string>('icon')
 
 const { value: languageId, errorMessage: languageError } =
 	useField<number>('languageId')
+const { value: nativeLanguageId } =
+	useField<number | null | undefined>('nativeLanguageId')
 const { value: languageLevelId, errorMessage: levelError } =
 	useField<number>('languageLvlId')
 const { value: categoryId } = useField<number | null | undefined>('categoryId')
@@ -136,10 +142,12 @@ watch(isOpen, open => {
 			description: props.data.description,
 			icon: props.data.icon,
 			languageId: props.data.languageId,
+			nativeLanguageId: props.data.nativeLanguageId,
 			languageLvlId: props.data.languageLvlId,
 			categoryId: props.data.categoryId,
 		})
 		isFree.value = props.data.isFree
+		isVisible.value = props.data.isVisible
 		languageLevels.refetch()
 		refetchProduct()
 	}
@@ -167,7 +175,9 @@ const onSubmit = handleSubmit(async values => {
 			description: values.description,
 			icon: values.icon,
 			isFree: isFree.value,
+			isVisible: isVisible.value,
 			languageId: values.languageId,
+			nativeLanguageId: values.nativeLanguageId ?? undefined,
 			languageLvlId: values.languageLvlId,
 			categoryId: values.categoryId ?? undefined,
 		})
@@ -228,7 +238,7 @@ const onSubmit = handleSubmit(async values => {
 
 						<div class="mt-2">
 							<Label>Icon</Label>
-							<Input v-model="icon" placeholder="Enter course icon.." />
+							<IconPicker v-model="icon" placeholder="Pick an icon" />
 							<p class="text-red-500 text-sm">{{ iconError }}</p>
 						</div>
 					</div>
@@ -255,6 +265,33 @@ const onSubmit = handleSubmit(async values => {
 								</SelectContent>
 							</Select>
 							<p class="text-red-500 text-sm">{{ languageError }}</p>
+						</div>
+
+						<div class="mt-2">
+							<Label>Original Language</Label>
+							<Select
+								:model-value="nativeLanguageId"
+								@update:model-value="
+									val =>
+										setFieldValue(
+											'nativeLanguageId',
+											val === null ? undefined : Number(val),
+										)
+								"
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Select original language" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem
+										v-for="l in languages.data.value?.data"
+										:key="l.id"
+										:value="l.id"
+									>
+										{{ l.name }}
+									</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 
 						<div class="mt-2">
@@ -353,6 +390,22 @@ const onSubmit = handleSubmit(async values => {
 							placeholder="9.99"
 						/>
 					</div>
+				</div>
+
+				<div class="mt-2">
+					<Label>Visibility</Label>
+					<Select
+						:model-value="isVisible ? 'visible' : 'hidden'"
+						@update:model-value="val => (isVisible = val === 'visible')"
+					>
+						<SelectTrigger>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="visible">Visible</SelectItem>
+							<SelectItem value="hidden">Hidden</SelectItem>
+						</SelectContent>
+					</Select>
 				</div>
 
 				<DialogFooter class="mt-4">

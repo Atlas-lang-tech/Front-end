@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDictionaryEdit } from '@/api/vocabulary/dictionaries/edit/useDictionaryEdit'
 import { useUserStore } from '@/stores/user.store'
-import Icon from '@/shared/icon.vue'
+import { IconPicker } from '@/components/IconPicker'
 import { Button } from '@/shared/ui/button'
 import {
 	Dialog,
@@ -14,13 +14,6 @@ import {
 } from '@/shared/ui/dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/shared/ui/select'
 import { toTypedSchema } from '@vee-validate/valibot'
 import { PencilIcon } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
@@ -28,7 +21,6 @@ import * as v from 'valibot'
 import { useField, useForm } from 'vee-validate'
 import { watch } from 'vue'
 import { toast } from 'vue-sonner'
-import { DICTIONARY_ICONS } from '../../dictionary-icons'
 
 // ---------------------
 // props / emits
@@ -150,23 +142,7 @@ const onSubmit = handleSubmit(async values => {
 
 				<div class="mt-2">
 					<Label>Icon</Label>
-					<Select v-model="icon">
-						<SelectTrigger class="w-full">
-							<SelectValue placeholder="Choose an icon" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem
-								v-for="name in DICTIONARY_ICONS"
-								:key="name"
-								:value="name"
-							>
-								<span class="flex items-center gap-2">
-									<Icon :name="name" :size="18" />
-									{{ name }}
-								</span>
-							</SelectItem>
-						</SelectContent>
-					</Select>
+					<IconPicker v-model="icon" placeholder="Pick an icon" />
 					<p class="text-red-500 text-sm">{{ iconError }}</p>
 				</div>
 

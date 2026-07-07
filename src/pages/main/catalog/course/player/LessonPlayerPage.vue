@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useBlockGetByLesson } from '@/api/blocks/get/byLessonId/useBlockGetByLesson.ts'
+import { useLessonComplete } from '@/api/lessons/complete/useLessonComplete.ts'
 import { useProduct } from '@/api/billing/products/get/byCourseId/useProduct.ts'
 import { useCourseGetById } from '@/api/courses/get/byId/useCourseGetById.ts'
+import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll.ts'
 import { useLessonGetByCourse } from '@/api/lessons/get/byCourseId/useLessonGetByCourse.ts'
 import { $PAGES } from '@/app/configs/pages.config'
 import Icon from '@/shared/icon.vue'
@@ -22,6 +24,7 @@ import { useRoute, useRouter } from 'vue-router'
 import CoursePurchaseModal from '../../(modals)/purchase/CoursePurchaseModal.vue'
 import { useLessonPlayer } from './useLessonPlayer.ts'
 import LessonMistakesReview from './widgets/LessonMistakesReview.vue'
+import LessonSelectionMenu from './widgets/LessonSelectionMenu.vue'
 import LessonProgressBar from './widgets/LessonProgressBar.vue'
 import LessonResultScreen from './widgets/LessonResultScreen.vue'
 import BuildSentenceTask from './widgets/blocks/BuildSentenceTask.vue'
@@ -51,8 +54,29 @@ const { data: courseData } = useCourseGetById({
 	id: String(route.params.courseId),
 })
 const { data: productData } = useProduct(courseId)
+const { state: languagesState } = useLanguageGetAll()
 
 const blocks = computed(() => state.value.data?.data ?? [])
+
+// ---------------------
+// translation languages
+// ---------------------
+
+const languageCodes = computed(() => {
+	const map = new Map<number, string>()
+	for (const lang of languagesState.value.data?.data ?? [])
+		map.set(lang.id, lang.code)
+	return map
+})
+
+const sourceCode = computed(
+	() => languageCodes.value.get(courseData.value?.data?.languageId ?? -1) ?? '',
+)
+
+const targetCode = computed(() => {
+	const nativeId = courseData.value?.data?.nativeLanguageId
+	return (nativeId ? languageCodes.value.get(nativeId) : null) ?? 'uk'
+})
 
 // ---------------------
 // access lock
@@ -93,6 +117,17 @@ const {
 } = useLessonPlayer(blocks, { lessonId, courseId })
 
 const showMistakes = ref(false)
+
+const { mutateAsync: completeLessonMutate } = useLessonComplete()
+
+watch(result, async r => {
+	if (!r?.passed) return
+	try {
+		await completeLessonMutate({ lessonId: r.lessonId })
+	} catch {
+		// access/availability errors are surfaced by the player's own 403 lock
+	}
+})
 
 const onSecondary = () => {
 	if (phase.value === 'review') leaveUnanswered()
@@ -247,7 +282,8 @@ watch(lessonId, () => {
 					:phase="phase"
 				/>
 
-				<Card class="p-8">
+				<LessonSelectionMenu :source-code="sourceCode" :target-code="targetCode">
+					<Card class="p-8">
 					<MarkdownBlock
 						v-if="currentBlock.type === 'MARKDOWN'"
 						:key="currentBlock.id"
@@ -305,6 +341,7 @@ watch(lessonId, () => {
 						@secondary="onSecondary"
 					/>
 				</Card>
+				</LessonSelectionMenu>
 			</template>
 		</template>
 

@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
 import { useCourseGetAll } from '@/api/courses/get/all/useCourseGetAll'
+import { useProgressStats } from '@/api/courses/get/progressStats/useProgressStats'
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
 import { useLanguageLevelGetAll } from '@/api/languages/level/get/all/useLanguageLevelGetAll'
 import { useUserGetAll } from '@/api/users/get/all/useUserGetAll'
 import AdminStatsCard from '@/components/admin/StatsCard/AdminStatsCard.vue'
-import { Badge } from '@/shared/ui/badge'
 import { Skeleton } from '@/shared/ui/skeleton'
 import type { User } from '@/types/user'
 import { computed } from 'vue'
 import DashboardActivityChart from './widgets/DashboardActivityChart.vue'
-import DashboardActivityFeed from './widgets/DashboardActivityFeed.vue'
 import DashboardBarList from './widgets/DashboardBarList.vue'
-import DashboardMockStat from './widgets/DashboardMockStat.vue'
 import DashboardRoleBreakdown from './widgets/DashboardRoleBreakdown.vue'
 
 // ---------------------
@@ -23,6 +21,7 @@ const coursesQuery = useCourseGetAll()
 const languagesQuery = useLanguageGetAll()
 const categoriesQuery = useCategoryGetAll()
 const levelsQuery = useLanguageLevelGetAll()
+const statsQuery = useProgressStats()
 
 // ---------------------
 // data
@@ -65,6 +64,27 @@ const coursesByCategory = computed(() =>
 )
 
 // ---------------------
+// progress insights
+// ---------------------
+const stats = computed(() => statsQuery.state.value.data?.data)
+
+const topCourses = computed(() =>
+	(stats.value?.topCourses ?? []).map(course => ({
+		label: course.title,
+		value: course.completions,
+	})),
+)
+
+const dailyCompletions = computed(() =>
+	(stats.value?.dailyCompletions ?? []).map(day => ({
+		label: new Date(day.date).toLocaleDateString('en-US', {
+			weekday: 'short',
+		}),
+		value: day.count,
+	})),
+)
+
+// ---------------------
 // states
 // ---------------------
 const isLoading = computed(() =>
@@ -74,6 +94,7 @@ const isLoading = computed(() =>
 		languagesQuery,
 		categoriesQuery,
 		levelsQuery,
+		statsQuery,
 	].some(query => query.asyncStatus.value === 'loading'),
 )
 
@@ -84,6 +105,7 @@ const isError = computed(() =>
 		languagesQuery,
 		categoriesQuery,
 		levelsQuery,
+		statsQuery,
 	].some(query => query.state.value.status === 'error'),
 )
 </script>
@@ -160,46 +182,47 @@ const isError = computed(() =>
 				color="bg-accent"
 			/>
 
-			<!-- demo section -->
+			<!-- progress insights -->
 			<div>
-				<div class="flex items-center gap-3 mb-1">
-					<h2 class="text-xl font-bold">Insights preview</h2>
-					<Badge variant="warning">Test data</Badge>
-				</div>
-				<p class="text-sm text-muted-foreground mb-4">
-					Приклад того, як це може виглядати — дані несправжні.
-				</p>
+				<h2 class="text-xl font-bold mb-4">Learning insights</h2>
 
 				<div class="flex flex-wrap gap-4 mb-4">
-					<DashboardMockStat
+					<AdminStatsCard
 						title="Active today"
-						value="248"
+						:value="stats?.activeToday ?? 0"
 						icon="activity"
 						color="green"
 					/>
-					<DashboardMockStat
-						title="New signups (7d)"
-						value="63"
-						icon="user-plus"
+					<AdminStatsCard
+						title="Completed (7d)"
+						:value="stats?.completionsLast7d ?? 0"
+						icon="circle-check"
 						color="blue"
 					/>
-					<DashboardMockStat
-						title="Completion rate"
-						value="74%"
-						icon="circle-check"
+					<AdminStatsCard
+						title="Active learners"
+						:value="stats?.activeLearners ?? 0"
+						icon="users"
 						color="purple"
 					/>
-					<DashboardMockStat
-						title="Learning hours"
-						value="1.2k"
-						icon="clock"
+					<AdminStatsCard
+						title="Total completions"
+						:value="stats?.totalCompletions ?? 0"
+						icon="trophy"
 						color="orange"
 					/>
 				</div>
 
 				<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-					<DashboardActivityChart />
-					<DashboardActivityFeed />
+					<DashboardActivityChart
+						title="Completions (last 7 days)"
+						:items="dailyCompletions"
+					/>
+					<DashboardBarList
+						title="Most completed courses"
+						:items="topCourses"
+						color="bg-status-success"
+					/>
 				</div>
 			</div>
 		</div>

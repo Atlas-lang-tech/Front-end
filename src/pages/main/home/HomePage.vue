@@ -3,18 +3,24 @@
 // data
 // ---------------------
 
+import { useCourseGetAll } from '@/api/courses/get/all/useCourseGetAll.ts'
+import { useMyProgress } from '@/api/courses/get/myProgress/useMyProgress.ts'
+import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll.ts'
+import { useLanguageLevelGetAll } from '@/api/languages/level/get/all/useLanguageLevelGetAll.ts'
+import { $PAGES } from '@/app/configs/pages.config'
 import {
-	continueLearning,
 	dashboardStats,
 	newsFeed,
 	todaySchedule,
 } from '@/app/data/main/DashboardData'
-import { $PAGES } from '@/app/configs/pages.config'
 import Icon from '@/shared/icon.vue'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { useBillingStore } from '@/stores/billing.store'
 import { useUserStore } from '@/stores/user.store'
+import type { Course } from '@/types/course'
 import { computed } from 'vue'
 import GreetingHero from './widgets/GreetingHero.vue'
 import NewsItem from './widgets/NewsItem.vue'
@@ -50,6 +56,125 @@ const today = computed(() =>
 		year: 'numeric',
 	}).format(new Date()),
 )
+
+// ---------------------
+// api
+// ---------------------
+
+const { data: catalogCourses } = useCourseGetAll()
+const { data: catalogLanguages } = useLanguageGetAll()
+const { data: catalogLevels } = useLanguageLevelGetAll()
+
+const billingStore = useBillingStore()
+
+// ---------------------
+// maps
+// ---------------------
+
+const languageMap = computed(
+	() => new Map((catalogLanguages.value?.data ?? []).map(l => [l.id, l])),
+)
+const levelMap = computed(
+	() => new Map((catalogLevels.value?.data ?? []).map(l => [l.id, l])),
+)
+
+// ---------------------
+// accessible courses + progress
+// ---------------------
+
+const accessibleCourses = computed(() =>
+	(catalogCourses.value?.data ?? []).filter(c =>
+		billingStore.canAccessCourse(c as Course),
+	),
+)
+const accessibleCourseIds = computed(() =>
+	accessibleCourses.value.map(c => Number(c.id)),
+)
+
+const { data: progressData, asyncStatus: progressStatus } =
+	useMyProgress(accessibleCourseIds)
+
+const progressByCourse = computed(
+	() => new Map((progressData.value ?? []).map(p => [p.courseId, p])),
+)
+
+const isLoading = computed(
+	() => !catalogCourses.value || progressStatus.value === 'loading',
+)
+
+// ---------------------
+// derived stats
+// ---------------------
+
+const inProgressCount = computed(
+	() =>
+		(progressData.value ?? []).filter(
+			p => p.completed > 0 && p.completed < p.total,
+		).length,
+)
+const completedCount = computed(
+	() =>
+		(progressData.value ?? []).filter(
+			p => p.total > 0 && p.completed === p.total,
+		).length,
+)
+
+const stats = computed(() => [
+	dashboardStats[0],
+	{
+		id: 2,
+		title: 'In progress',
+		value: String(inProgressCount.value),
+		icon: 'book-open',
+		color: 'orange' as const,
+	},
+	{
+		id: 3,
+		title: 'Completed',
+		value: String(completedCount.value),
+		icon: 'circle-check',
+		color: 'green' as const,
+	},
+	dashboardStats[3],
+])
+
+// ---------------------
+// continue learning
+// ---------------------
+
+const continueCourse = computed(() => {
+	const candidates = accessibleCourses.value.map(course => ({
+		course,
+		progress: progressByCourse.value.get(Number(course.id)),
+	}))
+
+	const picked =
+		candidates.find(
+			c =>
+				c.progress &&
+				c.progress.completed > 0 &&
+				c.progress.completed < c.progress.total,
+		) ??
+		candidates.find(
+			c => !c.progress || c.progress.completed < c.progress.total,
+		) ??
+		candidates[0]
+
+	if (!picked) return null
+
+	const total = picked.progress?.total ?? 0
+	const completed = picked.progress?.completed ?? 0
+
+	return {
+		id: picked.course.id,
+		title: picked.course.title,
+		language: languageMap.value.get(picked.course.languageId)?.name ?? '',
+		level: levelMap.value.get(picked.course.languageLvlId)?.name ?? '',
+		icon: picked.course.icon || 'book-marked',
+		progress: total > 0 ? Math.round((completed / total) * 100) : 0,
+		lessonsLeft: Math.max(0, total - completed),
+	}
+})
 </script>
 
 <template>
@@ -65,9 +190,15 @@ const today = computed(() =>
 				/>
 
 				<!-- stats -->
-				<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+				<div
+					v-if="isLoading"
+					class="grid grid-cols-2 lg:grid-cols-4 gap-4"
+				>
+					<Skeleton v-for="i in 4" :key="i" class="h-20 w-full rounded-xl" />
+				</div>
+				<div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 					<StatCard
-						v-for="stat in dashboardStats"
+						v-for="stat in stats"
 						:key="stat.id"
 						:title="stat.title"
 						:value="stat.value"
@@ -77,7 +208,10 @@ const today = computed(() =>
 				</div>
 
 				<!-- continue learning -->
-				<Card class="p-5">
+				<Card v-if="isLoading" class="p-5">
+					<Skeleton class="h-20 w-full rounded-xl" />
+				</Card>
+				<Card v-else-if="continueCourse" class="p-5">
 					<div class="flex items-center justify-between mb-4">
 						<h2 class="text-lg font-bold">Continue learning</h2>
 						<RouterLink :to="$PAGES.main.myLearning">
@@ -89,18 +223,20 @@ const today = computed(() =>
 						<div
 							class="flex items-center justify-center size-14 rounded-xl bg-card-secondary text-primary shrink-0"
 						>
-							<Icon :name="continueLearning.icon" :size="26" />
+							<Icon :name="continueCourse.icon" :size="26" />
 						</div>
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2 mb-1">
 								<h3 class="font-semibold truncate">
-									{{ continueLearning.title }}
+									{{ continueCourse.title }}
 								</h3>
-								<Badge variant="outline">{{ continueLearning.level }}</Badge>
+								<Badge v-if="continueCourse.level" variant="outline">
+									{{ continueCourse.level }}
+								</Badge>
 							</div>
 							<p class="text-sm text-muted-foreground">
-								{{ continueLearning.language }} ·
-								{{ continueLearning.lessonsLeft }} lessons left
+								{{ continueCourse.language }} ·
+								{{ continueCourse.lessonsLeft }} lessons left
 							</p>
 							<div class="flex items-center gap-3 mt-3">
 								<div
@@ -108,15 +244,17 @@ const today = computed(() =>
 								>
 									<div
 										class="h-full rounded-full bg-primary transition-all"
-										:style="{ width: `${continueLearning.progress}%` }"
+										:style="{ width: `${continueCourse.progress}%` }"
 									/>
 								</div>
 								<span class="text-sm font-medium text-muted-foreground">
-									{{ continueLearning.progress }}%
+									{{ continueCourse.progress }}%
 								</span>
 							</div>
 						</div>
-						<Button class="shrink-0">Resume</Button>
+						<RouterLink :to="$PAGES.main.course(continueCourse.id)">
+							<Button class="shrink-0">Resume</Button>
+						</RouterLink>
 					</div>
 				</Card>
 

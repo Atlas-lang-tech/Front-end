@@ -13,6 +13,7 @@ defineProps<{
 	lesson: Lesson
 	index: number
 	locked: boolean
+	completed: boolean
 }>()
 </script>
 
@@ -22,9 +23,15 @@ defineProps<{
 		:class="locked ? 'opacity-60' : 'hover:shadow-md'"
 	>
 		<div
-			class="flex items-center justify-center size-11 shrink-0 rounded-full bg-card-secondary text-primary font-bold"
+			class="flex items-center justify-center size-11 shrink-0 rounded-full font-bold"
+			:class="
+				completed
+					? 'bg-status-success/10 text-status-success'
+					: 'bg-card-secondary text-primary'
+			"
 		>
-			{{ index + 1 }}
+			<Icon v-if="completed" name="check" :size="20" />
+			<template v-else>{{ index + 1 }}</template>
 		</div>
 
 		<div class="flex-1 min-w-0">

@@ -4,6 +4,7 @@ import { useCategoryGetAll } from '@/api/categories/get/all/useCategoryGetAll'
 import { useCourseCreate } from '@/api/courses/create/useCourseCreate'
 import { useLanguageGetAll } from '@/api/languages/get/all/useLanguageGetAll'
 import { useLanguageLevelGetByLanguageId } from '@/api/languages/level/get/AllByLanguageId/useLanguageLevelGetByLanguageId'
+import { IconPicker } from '@/components/IconPicker'
 import { Button } from '@/shared/ui/button'
 import {
 	Dialog,
@@ -49,6 +50,7 @@ const schema = v.object({
 	icon: v.pipe(v.string(), v.trim(), v.minLength(1, 'Icon is required')),
 
 	languageId: v.number('Language is required'),
+	nativeLanguageId: v.optional(v.number()),
 	languageLevelId: v.number('Language level is required'),
 
 	categoryId: v.optional(v.number()),
@@ -67,6 +69,7 @@ const categories = useCategoryGetAll()
 // ---------------------
 const isFree = ref(true)
 const price = ref<number | undefined>(undefined)
+const isVisible = ref(true)
 
 // ---------------------
 // form
@@ -79,6 +82,7 @@ const { handleSubmit, resetForm, setFieldValue, isSubmitting } = useForm({
 		description: '',
 		icon: '',
 		languageId: undefined,
+		nativeLanguageId: undefined,
 		languageLevelId: undefined,
 		categoryId: undefined,
 	},
@@ -95,6 +99,8 @@ const { value: icon, errorMessage: iconError } = useField<string>('icon')
 
 const { value: languageId, errorMessage: languageError } =
 	useField<number>('languageId')
+const { value: nativeLanguageId } =
+	useField<number | undefined>('nativeLanguageId')
 const { value: languageLevelId, errorMessage: levelError } =
 	useField<number>('languageLevelId')
 const { value: categoryId } = useField<number | undefined>('categoryId')
@@ -124,7 +130,9 @@ const onSubmit = handleSubmit(async formValues => {
 			description: formValues.description,
 			icon: formValues.icon,
 			isFree: isFree.value,
+			isVisible: isVisible.value,
 			languageId: formValues.languageId,
+			nativeLanguageId: formValues.nativeLanguageId,
 			languageLvlId: formValues.languageLevelId,
 			categoryId: formValues.categoryId,
 		})
@@ -145,6 +153,7 @@ const onSubmit = handleSubmit(async formValues => {
 		resetForm()
 		isFree.value = true
 		price.value = undefined
+		isVisible.value = true
 		isOpen.value = false
 		emit('success')
 	} catch (e) {
@@ -186,7 +195,7 @@ const onSubmit = handleSubmit(async formValues => {
 
 						<div class="mt-2">
 							<Label>Icon</Label>
-							<Input v-model="icon" placeholder="Enter course icon.." />
+							<IconPicker v-model="icon" placeholder="Pick an icon" />
 							<p class="text-red-500 text-sm">{{ iconError }}</p>
 						</div>
 					</div>
@@ -219,6 +228,33 @@ const onSubmit = handleSubmit(async formValues => {
 								</SelectContent>
 							</Select>
 							<p class="text-red-500 text-sm">{{ languageError }}</p>
+						</div>
+
+						<div class="mt-2">
+							<Label>Original Language</Label>
+							<Select
+								:model-value="nativeLanguageId"
+								@update:model-value="
+									val =>
+										setFieldValue(
+											'nativeLanguageId',
+											val === null ? undefined : Number(val),
+										)
+								"
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Select original language" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem
+										v-for="language in languages.data.value?.data"
+										:key="language.id"
+										:value="language.id"
+									>
+										{{ language.name }}
+									</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 
 						<div class="mt-2">
@@ -317,6 +353,22 @@ const onSubmit = handleSubmit(async formValues => {
 							placeholder="9.99"
 						/>
 					</div>
+				</div>
+
+				<div class="mt-2">
+					<Label>Visibility</Label>
+					<Select
+						:model-value="isVisible ? 'visible' : 'hidden'"
+						@update:model-value="val => (isVisible = val === 'visible')"
+					>
+						<SelectTrigger>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="visible">Visible</SelectItem>
+							<SelectItem value="hidden">Hidden</SelectItem>
+						</SelectContent>
+					</Select>
 				</div>
 
 				<DialogFooter class="mt-4">

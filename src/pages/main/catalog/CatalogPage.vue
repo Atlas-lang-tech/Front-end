@@ -12,7 +12,8 @@ import {
 	SelectValue,
 } from '@/shared/ui/select'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { computed, ref } from 'vue'
+import { usePreferencesStore } from '@/stores/preferences.store'
+import { computed, ref, watch } from 'vue'
 import CourseCard from './widgets/CourseCard.vue'
 
 // ---------------------
@@ -30,9 +31,28 @@ const { data: catalogProducts } = useProducts()
 
 const ALL = 'all'
 
+const preferences = usePreferencesStore()
+
+const nativeLanguageId = ref(
+	preferences.nativeLanguageId != null
+		? String(preferences.nativeLanguageId)
+		: ALL,
+)
 const languageId = ref(ALL)
 const levelId = ref(ALL)
 const categoryId = ref(ALL)
+
+watch(nativeLanguageId, value => {
+	preferences.setNativeLanguageId(value === ALL ? null : Number(value))
+})
+
+watch(
+	() => preferences.nativeLanguageId,
+	value => {
+		const next = value != null ? String(value) : ALL
+		if (next !== nativeLanguageId.value) nativeLanguageId.value = next
+	},
+)
 
 const languageMap = computed(
 	() => new Map(catalogLanguages.value?.data.map(l => [l.id, l])),
@@ -78,6 +98,11 @@ const courses = computed(() =>
 	(catalogCourses.value?.data ?? [])
 		.filter(
 			c =>
+				nativeLanguageId.value === ALL ||
+				c.nativeLanguageId === Number(nativeLanguageId.value),
+		)
+		.filter(
+			c =>
 				languageId.value === ALL || c.languageId === Number(languageId.value),
 		)
 		.filter(
@@ -119,6 +144,25 @@ const courses = computed(() =>
 		<div
 			class="flex flex-col sm:flex-row sm:items-end gap-4 mb-8 pb-6 border-b border-border"
 		>
+			<div class="flex flex-col gap-1.5">
+				<span class="text-xs font-medium text-muted">My language</span>
+				<Select v-model="nativeLanguageId">
+					<SelectTrigger class="w-full sm:w-48">
+						<SelectValue placeholder="All languages" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem :value="ALL">All languages</SelectItem>
+						<SelectItem
+							v-for="language in catalogLanguages?.data"
+							:key="language.id"
+							:value="String(language.id)"
+						>
+							{{ language.name }}
+						</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
 			<div class="flex flex-col gap-1.5">
 				<span class="text-xs font-medium text-muted">Language</span>
 				<Select v-model="languageId" @update:model-value="onLanguageChange">

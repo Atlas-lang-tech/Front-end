@@ -10,7 +10,6 @@ import {
   type MistakeItem,
   type TaskActionMode,
 } from "./lesson-player.types";
-import { submitLessonResult } from "./submit-lesson-result";
 
 export const useLessonPlayer = (
   blocks: Ref<Block[]>,
@@ -94,7 +93,6 @@ export const useLessonPlayer = (
     };
 
     phase.value = "results";
-    void submitLessonResult(result.value);
   };
 
   const advanceMain = () => {

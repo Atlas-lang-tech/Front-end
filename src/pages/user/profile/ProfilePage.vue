@@ -80,6 +80,12 @@ const formatDate = (value?: string | null) =>
 					>
 						<Mail class="w-4 h-4 shrink-0" />
 						{{ user?.email ?? '—' }}
+						<Badge
+							:variant="user?.emailVerified ? 'success' : 'pending'"
+							class="ml-1"
+						>
+							{{ user?.emailVerified ? 'Verified' : 'Unverified' }}
+						</Badge>
 					</p>
 				</div>
 			</div>

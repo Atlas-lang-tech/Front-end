@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 
-import { usePlans } from '@/api/billing/plans/get/all/usePlans'
+import { usePlans } from '@/api/billing/plans/get/all/useAllPlans'
 import { useUserPlanEdit } from '@/api/users/plan/useUserPlanEdit'
 import { Button } from '@/shared/ui/button'
 import {

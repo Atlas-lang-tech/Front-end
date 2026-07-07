@@ -4,4 +4,5 @@ export interface User {
 	email: string
 	role: 'ADMIN' | 'USER' | 'MODERATOR'
 	planCode?: string
+	emailVerified?: boolean
 }

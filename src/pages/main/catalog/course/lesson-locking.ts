@@ -1,10 +1,11 @@
 import type { Lesson } from "@/types/lesson";
 
 export const isLessonLocked = (
-  _lesson: Lesson,
-  _orderedLessons: Lesson[],
+  lesson: Lesson,
+  orderedLessons: Lesson[],
+  completedLessonIds: number[],
 ): boolean => {
-  // TODO(progress): lock lesson N until lesson N-1 is passed.
-  // Requires backend progress persistence. Until then every lesson is unlocked.
-  return false;
+  const index = orderedLessons.findIndex((l) => l.id === lesson.id);
+  if (index <= 0) return false;
+  return !completedLessonIds.includes(orderedLessons[index - 1].id);
 };
